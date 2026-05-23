@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flooring Calculator — RenoPlot</title>
+  <meta name="description" content="Calculate exactly how much flooring you need for any room. Free calculator for hardwood, laminate, vinyl, carpet and tile — in feet or meters.">
+  <link rel="stylesheet" href="../style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
+    </div>
+  </header>
+
+  <!-- PAGE -->
+  <main class="calc-page">
+
+    <div class="calc-page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a>
+        <span>›</span>
+        <span>Flooring Calculator</span>
+      </div>
+      <h1 class="calc-page-title">Flooring Calculator</h1>
+      <p class="calc-page-desc">Enter your room dimensions and flooring type to find out exactly how many boxes or square feet to buy — waste factor included.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Room Details</div>
+
+        <!-- UNIT TOGGLE -->
+        <div class="field">
+          <label>Unit System</label>
+          <div class="unit-toggle">
+            <button class="unit-btn active" id="btn-ft" onclick="setUnit('ft')">Feet (ft)</button>
+            <button class="unit-btn" id="btn-m" onclick="setUnit('m')">Meters (m)</button>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="room-length">Room Length <span id="lbl-length">(ft)</span></label>
+            <input type="number" id="room-length" placeholder="e.g. 12" min="0.1" step="0.1">
+          </div>
+          <div class="field">
+            <label for="room-width">Room Width <span id="lbl-width">(ft)</span></label>
+            <input type="number" id="room-width" placeholder="e.g. 10" min="0.1" step="0.1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="flooring-type">Flooring Type</label>
+          <select id="flooring-type" onchange="updateCoverage()">
+            <option value="hardwood">Hardwood</option>
+            <option value="laminate">Laminate</option>
+            <option value="vinyl">Vinyl / LVP</option>
+            <option value="carpet">Carpet</option>
+            <option value="tile">Tile</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="box-coverage">Box Coverage <span id="lbl-coverage">(sq ft per box)</span></label>
+          <input type="number" id="box-coverage" placeholder="e.g. 20" min="1" step="0.1">
+          <div class="field-hint" id="coverage-hint">Typical hardwood box covers 20 sq ft. Check your product label.</div>
+        </div>
+
+        <div class="field">
+          <label for="waste-factor">Waste Factor</label>
+          <select id="waste-factor">
+            <option value="1.05">5% — Straight lay, simple room</option>
+            <option value="1.10" selected>10% — Diagonal or offset pattern (recommended)</option>
+            <option value="1.15">15% — Complex layout or many cuts</option>
+          </select>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Flooring Needed</button>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="panel">
+        <div class="panel-title">Your Estimate</div>
+
+        <div class="results-placeholder" id="placeholder">
+          <div class="results-placeholder-icon">🪵</div>
+          <p>Fill in your room details and click Calculate to see your flooring estimate.</p>
+        </div>
+
+        <div id="results" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">Boxes Needed</div>
+            <div class="result-number" id="result-boxes">0</div>
+            <div class="result-unit">boxes (including waste)</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Room area</span>
+              <span class="breakdown-value" id="bd-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Area with waste</span>
+              <span class="breakdown-value" id="bd-area-waste">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coverage per box</span>
+              <span class="breakdown-value" id="bd-coverage">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Flooring type</span>
+              <span class="breakdown-value" id="bd-type">—</span>
+            </div>
+          </div>
+
+          <div class="result-note" id="result-note"></div>
+
+          <div class="result-note" style="margin-top:10px; background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+      <h2>How to Calculate How Much Flooring You Need</h2>
+      <p>The basic formula is simple: multiply the length of the room by the width to get the square footage, then add a waste factor to account for cuts, mistakes, and future repairs. Divide the total by the coverage per box to get the number of boxes to buy.</p>
+
+      <h3>Why the Waste Factor Matters</h3>
+      <p>Every flooring installation produces offcuts, especially around doorways, corners, and obstacles. A straight lay pattern in a simple rectangular room needs about 5% extra. A diagonal or herringbone pattern can waste 10 to 15% due to the angle cuts on every row. Always round up to the nearest full box — you cannot buy half a box, and having a few planks left over is useful for future repairs.</p>
+
+      <h3>Coverage by Flooring Type</h3>
+      <p>Hardwood and laminate boxes typically cover 15 to 25 square feet. Vinyl plank (LVP) boxes usually cover 18 to 24 square feet. Carpet is often sold by the square yard, so divide your square footage by 9. Tile coverage depends on tile size; always check the product label for the exact figure.</p>
+
+      <h3>Tips Before You Buy</h3>
+      <p>Buy all boxes from the same production lot (same dye lot number) to ensure consistent color. Store boxes in the room for 48 hours before installation so the material acclimates to the temperature and humidity. Keep at least one box in reserve after the job for future touch-ups.</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+    </div>
+  </footer>
+
+  <script>
+    let currentUnit = 'ft';
+
+    const coverageDefaults = {
+      hardwood: { ft: 20, m: 1.86, hint: 'Typical hardwood box covers 20 sq ft. Check your product label.' },
+      laminate: { ft: 22, m: 2.04, hint: 'Typical laminate box covers 22 sq ft. Check your product label.' },
+      vinyl:    { ft: 20, m: 1.86, hint: 'Typical vinyl/LVP box covers 20 sq ft. Check your product label.' },
+      carpet:   { ft: 25, m: 2.32, hint: 'Carpet is often sold by the yard. This estimate uses sq ft per roll section.' },
+      tile:     { ft: 10, m: 0.93, hint: 'Tile coverage varies by size. Always check the box for exact sq ft.' }
+    };
+
+    function setUnit(unit) {
+      currentUnit = unit;
+      document.getElementById('btn-ft').classList.toggle('active', unit === 'ft');
+      document.getElementById('btn-m').classList.toggle('active', unit === 'm');
+      document.getElementById('lbl-length').textContent = unit === 'ft' ? '(ft)' : '(m)';
+      document.getElementById('lbl-width').textContent = unit === 'ft' ? '(ft)' : '(m)';
+      document.getElementById('lbl-coverage').textContent = unit === 'ft' ? '(sq ft per box)' : '(m² per box)';
+      updateCoverage();
+    }
+
+    function updateCoverage() {
+      const type = document.getElementById('flooring-type').value;
+      const data = coverageDefaults[type];
+      document.getElementById('box-coverage').value = currentUnit === 'ft' ? data.ft : data.m;
+      document.getElementById('coverage-hint').textContent = data.hint;
+    }
+
+    function calculate() {
+      const length = parseFloat(document.getElementById('room-length').value);
+      const width = parseFloat(document.getElementById('room-width').value);
+      const coverage = parseFloat(document.getElementById('box-coverage').value);
+      const waste = parseFloat(document.getElementById('waste-factor').value);
+      const type = document.getElementById('flooring-type').value;
+
+      if (!length || !width || !coverage || length <= 0 || width <= 0 || coverage <= 0) {
+        alert('Please enter valid room dimensions and box coverage.');
+        return;
+      }
+
+      const area = length * width;
+      const areaWithWaste = area * waste;
+      const boxesExact = areaWithWaste / coverage;
+      const boxesRounded = Math.ceil(boxesExact);
+      const unit = currentUnit === 'ft' ? 'sq ft' : 'm²';
+      const wastePercent = Math.round((waste - 1) * 100);
+
+      const typeLabels = {
+        hardwood: 'Hardwood',
+        laminate: 'Laminate',
+        vinyl: 'Vinyl / LVP',
+        carpet: 'Carpet',
+        tile: 'Tile'
+      };
+
+      document.getElementById('bd-area').textContent = area.toFixed(1) + ' ' + unit;
+      document.getElementById('bd-area-waste').textContent = areaWithWaste.toFixed(1) + ' ' + unit + ' (+' + wastePercent + '%)';
+      document.getElementById('bd-coverage').textContent = coverage + ' ' + unit + '/box';
+      document.getElementById('bd-type').textContent = typeLabels[type];
+      document.getElementById('result-boxes').textContent = boxesRounded;
+
+      const note = `You need approximately ${areaWithWaste.toFixed(1)} ${unit} of ${typeLabels[type].toLowerCase()} including the ${wastePercent}% waste factor. Buy all boxes from the same lot number to ensure consistent color matching.`;
+      document.getElementById('result-note').textContent = note;
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+    }
+
+    // Initialize default coverage on load
+    updateCoverage();
+  </script>
+
+  <style>
+    .unit-toggle {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .unit-btn {
+      flex: 1;
+      padding: 9px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .unit-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--white);
+    }
+    .unit-btn:hover:not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+
+</body>
+</html>
