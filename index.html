@@ -1,39 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RenoPlot — Home Improvement Calculators</title>
-  <meta name="description" content="Free home improvement calculators for your renovation projects. Estimate paint, concrete, flooring, roofing, and more." />
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RenoPlot — Free Home Improvement Calculators</title>
+  <meta name="description" content="Free, accurate calculators for your home improvement projects. Paint, flooring, concrete, roofing and more — get instant estimates before you buy.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <a href="/" class="logo">RenoPlot</a>
-      <p class="tagline">Home improvement calculators that actually help.</p>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
     </div>
   </header>
 
-  <main>
-    <div class="container">
-      <h1>Free Home Improvement Calculators</h1>
-      <p class="intro">Pick a calculator below and get an instant estimate for your project.</p>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Plan smarter.<br><span>Build with confidence.</span></h1>
+    <p>Free, accurate calculators for every home improvement project — from paint to flooring to concrete. Know exactly what you need before you buy.</p>
+  </section>
 
-      <div class="grid">
-        <a href="/calculators/paint-calculator.html" class="card">
-          <span class="icon">🎨</span>
-          <h2>Paint Calculator</h2>
-          <p>Find out how many gallons of paint you need for any room.</p>
-        </a>
-      </div>
+  <!-- MAIN -->
+  <main class="main-content">
+    <h2 class="section-title">All Calculators</h2>
+    <p class="section-subtitle">Click any calculator to get an instant estimate for your project.</p>
+
+    <div class="calc-grid">
+
+      <!-- Paint Calculator -->
+      <a href="calculators/paint-calculator.html" class="calc-card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Paint Calculator</div>
+        <p class="card-desc">Calculate exactly how many gallons of paint you need for any room. Accounts for doors, windows, and number of coats.</p>
+        <div class="card-cta">Calculate now →</div>
+      </a>
+
     </div>
   </main>
 
-  <footer>
-    <div class="container">
-      <p>© 2025 RenoPlot. All rights reserved.</p>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
     </div>
   </footer>
+
 </body>
 </html>
