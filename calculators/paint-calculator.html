@@ -132,6 +132,10 @@
           </div>
 
           <div class="result-note" id="result-note"></div>
+
+          <div class="result-note" style="margin-top:10px; background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
         </div>
       </div>
     </div>
@@ -145,63 +149,4 @@
       <p>Add up the total wall area of the room (perimeter × ceiling height), subtract the area of doors and windows, then divide by the paint's coverage rate. Multiply by the number of coats you plan to apply.</p>
 
       <h3>Why Add a Buffer?</h3>
-      <p>Paint coverage listed on the can assumes ideal conditions: smooth walls, one coat, no waste. Real-world painting always uses more. We recommend rounding up to the nearest gallon and keeping a quart in reserve for touch-ups.</p>
-
-      <h3>Coverage by Paint Type</h3>
-      <p>Standard latex paint covers around 350 square feet per gallon. Premium paints with higher solids content can cover up to 400 square feet. Rough or textured surfaces absorb more paint and may only yield 300 square feet per gallon.</p>
-
-      <h3>Should You Paint the Ceiling?</h3>
-      <p>This calculator covers walls only. For the ceiling, measure the floor area of the room and apply the same coverage formula separately. Ceiling paint typically uses a flat finish with slightly different coverage.</p>
-    </div>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-logo">Reno<span>Plot</span></div>
-      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
-    </div>
-  </footer>
-
-  <script>
-    function calculate() {
-      const length = parseFloat(document.getElementById('room-length').value);
-      const width = parseFloat(document.getElementById('room-width').value);
-      const height = parseFloat(document.getElementById('ceiling-height').value);
-      const coats = parseInt(document.getElementById('num-coats').value);
-      const doors = parseInt(document.getElementById('num-doors').value) || 0;
-      const windows = parseInt(document.getElementById('num-windows').value) || 0;
-      const coverage = parseInt(document.getElementById('paint-coverage').value);
-
-      if (!length || !width || !height || length <= 0 || width <= 0 || height <= 0) {
-        alert('Please enter valid room dimensions.');
-        return;
-      }
-
-      const wallArea = 2 * (length + width) * height;
-      const deductions = (doors * 20) + (windows * 15);
-      const paintableArea = Math.max(wallArea - deductions, 0);
-      const totalArea = paintableArea * coats;
-      const gallonsExact = totalArea / coverage;
-      const gallonsRounded = Math.ceil(gallonsExact);
-
-      document.getElementById('bd-wall-area').textContent = wallArea.toFixed(0) + ' sq ft';
-      document.getElementById('bd-paintable').textContent = paintableArea.toFixed(0) + ' sq ft';
-      document.getElementById('bd-coats').textContent = coats + (coats === 1 ? ' coat' : ' coats');
-      document.getElementById('bd-total').textContent = totalArea.toFixed(0) + ' sq ft';
-      document.getElementById('result-gallons').textContent = gallonsRounded;
-      document.getElementById('result-unit-label').textContent = gallonsRounded === 1 ? 'gallon' : 'gallons';
-
-      const note = gallonsExact % 1 < 0.15 && gallonsRounded > 1
-        ? `You're very close to ${gallonsRounded - 1} gallons. We recommend buying ${gallonsRounded} to have extra for touch-ups.`
-        : `This estimate includes a small buffer. Always buy a little extra — leftover paint is useful for future touch-ups.`;
-      document.getElementById('result-note').textContent = note;
-
-      document.getElementById('placeholder').style.display = 'none';
-      document.getElementById('results').style.display = 'block';
-    }
-  </script>
-
-</body>
-</html>
+      <p>Paint coverage listed on the can assumes ideal conditi
