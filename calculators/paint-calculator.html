@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paint Calculator — How Much Paint Do I Need? | RenoPlot</title>
+  <meta name="description" content="Free paint calculator. Enter your room dimensions and get an instant estimate of how many gallons of paint you need for walls and ceiling." />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="/" class="logo">RenoPlot</a>
+      <p class="tagline">Home improvement calculators that actually help.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="calc-wrapper">
+
+        <p class="breadcrumb"><a href="/">Home</a> › Paint Calculator</p>
+
+        <h1>Paint Calculator</h1>
+        <p class="intro">Enter your room dimensions below to find out how many gallons of paint you need. We account for doors and windows automatically.</p>
+
+        <div class="form-group">
+          <label for="length">Room Length (ft)</label>
+          <input type="number" id="length" placeholder="e.g. 14" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="width">Room Width (ft)</label>
+          <input type="number" id="width" placeholder="e.g. 12" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="height">Ceiling Height (ft)</label>
+          <input type="number" id="height" placeholder="e.g. 9" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="doors">Number of Doors</label>
+          <input type="number" id="doors" placeholder="e.g. 1" min="0" value="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="windows">Number of Windows</label>
+          <input type="number" id="windows" placeholder="e.g. 2" min="0" value="2" />
+        </div>
+
+        <div class="form-group">
+          <label for="coats">Number of Coats</label>
+          <select id="coats">
+            <option value="1">1 coat</option>
+            <option value="2" selected>2 coats (recommended)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ceiling">Include Ceiling?</label>
+          <select id="ceiling">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <button class="btn" onclick="calculate()">Calculate Paint Needed</button>
+
+        <div class="result-box" id="result">
+          <h2>Your Estimate</h2>
+          <p>Wall area: <strong><span id="res-wall-area"></span> sq ft</strong></p>
+          <p>Ceiling area: <strong><span id="res-ceil-area"></span></strong></p>
+          <p>Total area to paint: <strong><span id="res-total"></span> sq ft</strong></p>
+          <p>Gallons needed: <strong><span id="res-gallons"></span> gallons</strong></p>
+          <p style="margin-top:12px; font-size:0.88rem; color:#555;">Based on 350 sq ft per gallon per coat, standard for most interior paints. Always buy 10% extra for touch-ups.</p>
+        </div>
+
+        <article style="margin-top: 48px;">
+          <h2 style="font-size:1.3rem; margin-bottom:12px;">How to Calculate How Much Paint You Need</h2>
+          <p style="margin-bottom:12px;">The standard coverage for most interior latex paints is <strong>350 square feet per gallon</strong> per coat. To estimate your project:</p>
+          <ol style="margin-left:20px; margin-bottom:12px;">
+            <li>Measure the length and width of your room.</li>
+            <li>Multiply the perimeter (length + width × 2) by the ceiling height to get total wall area.</li>
+            <li>Subtract 20 sq ft per door and 15 sq ft per window.</li>
+            <li>Divide by 350 to get gallons per coat.</li>
+            <li>Multiply by the number of coats.</li>
+          </ol>
+          <p style="margin-bottom:12px;">Most rooms benefit from two coats, especially when painting over a dark color or bare drywall. Add 10% to your final number to account for touch-ups and waste.</p>
+          <h3 style="font-size:1.1rem; margin: 20px 0 8px;">Tips for Buying Paint</h3>
+          <p style="margin-bottom:12px;">Paint is sold in quarts (1 qt = 0.25 gal) and gallons. If your estimate lands between sizes, round up. Leftover paint stores well for touch-ups if sealed properly.</p>
+          <p>For ceilings, use a dedicated ceiling paint — it is formulated to resist drips and usually requires only one coat.</p>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 RenoPlot. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const length  = parseFloat(document.getElementById('length').value);
+      const width   = parseFloat(document.getElementById('width').value);
+      const height  = parseFloat(document.getElementById('height').value);
+      const doors   = parseFloat(document.getElementById('doors').value) || 0;
+      const windows = parseFloat(document.getElementById('windows').value) || 0;
+      const coats   = parseInt(document.getElementById('coats').value);
+      const inclCeil = document.getElementById('ceiling').value === 'yes';
+
+      if (!length || !width || !height) {
+        alert('Please enter the room length, width, and ceiling height.');
+        return;
+      }
+
+      const perimeter  = 2 * (length + width);
+      const wallArea   = (perimeter * height) - (doors * 20) - (windows * 15);
+      const ceilArea   = inclCeil ? length * width : 0;
+      const totalArea  = wallArea + ceilArea;
+      const gallons    = Math.ceil((totalArea / 350) * coats * 10) / 10;
+
+      document.getElementById('res-wall-area').textContent = Math.round(wallArea);
+      document.getElementById('res-ceil-area').textContent = inclCeil ? Math.round(ceilArea) + ' sq ft' : 'Not included';
+      document.getElementById('res-total').textContent     = Math.round(totalArea);
+      document.getElementById('res-gallons').textContent   = gallons.toFixed(1);
+
+      const box = document.getElementById('result');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  </script>
+</body>
+</html>
