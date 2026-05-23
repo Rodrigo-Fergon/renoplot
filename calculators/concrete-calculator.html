@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concrete Calculator – Slabs, Footings & Steps | RenoPlot</title>
+  <meta name="description" content="Free concrete calculator for slabs, footings, and steps. Estimate how many cubic yards or cubic meters of concrete you need for your project." />
+  <link rel="stylesheet" href="../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .shape-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .shape-tab {
+      flex: 1;
+      min-width: 80px;
+      padding: 10px 8px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .shape-tab:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .shape-tab.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+    .shape-icon {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    .section-panel {
+      display: none;
+    }
+    .section-panel.active {
+      display: block;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .result-card .result-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .result-card .result-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .result-card .result-unit {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .bags-section {
+      background: #f0f7ff;
+      border: 1px solid #bdd7f5;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .bags-section h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 12px 0;
+    }
+    .bags-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #dde9f7;
+      font-size: 14px;
+    }
+    .bags-row:last-child {
+      border-bottom: none;
+    }
+    .bags-row span:last-child {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    @media (max-width: 480px) {
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">RenoPlot</a>
+      <nav class="header-nav">
+        <a href="../index.html">All Calculators</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="calc-page">
+
+    <section class="calc-hero">
+      <div class="hero-inner">
+        <div class="hero-badge">Material Estimator</div>
+        <h1>Concrete Calculator</h1>
+        <p>Estimate how much concrete you need for slabs, footings, and steps — in cubic yards or cubic meters.</p>
+      </div>
+    </section>
+
+    <div class="calc-wrapper">
+
+      <!-- LEFT PANEL: INPUTS -->
+      <div class="calc-panel inputs-panel">
+        <h2 class="panel-title">Project Details</h2>
+
+        <!-- Unit toggle -->
+        <div class="field-group">
+          <label class="field-label">Measurement Units</label>
+          <div class="toggle-row">
+            <button class="toggle-btn active" id="btn-imperial" onclick="setUnits('imperial')">Feet &amp; Inches</button>
+            <button class="toggle-btn" id="btn-metric" onclick="setUnits('metric')">Meters</button>
+          </div>
+        </div>
+
+        <!-- Shape tabs -->
+        <div class="field-group">
+          <label class="field-label">Shape</label>
+          <div class="shape-tabs">
+            <button class="shape-tab active" onclick="setShape('slab', this)">
+              <span class="shape-icon">▭</span>Slab
+            </button>
+            <button class="shape-tab" onclick="setShape('footing', this)">
+              <span class="shape-icon">⬜</span>Footing
+            </button>
+            <button class="shape-tab" onclick="setShape('column', this)">
+              <span class="shape-icon">⬬</span>Column
+            </button>
+            <button class="shape-tab" onclick="setShape('steps', this)">
+              <span class="shape-icon">🪜</span>Steps
+            </button>
+          </div>
+        </div>
+
+        <!-- SLAB -->
+        <div class="section-panel active" id="panel-slab">
+          <div class="field-group">
+            <label class="field-label" id="slab-length-label">Length (ft)</label>
+            <input type="number" class="field-input" id="slab-length" placeholder="e.g. 12" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="slab-width-label">Width (ft)</label>
+            <input type="number" class="field-input" id="slab-width" placeholder="e.g. 10" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="slab-depth-label">Thickness (in)</label>
+            <input type="number" class="field-input" id="slab-depth" placeholder="e.g. 4" min="0" oninput="calculate()" />
+          </div>
+        </div>
+
+        <!-- FOOTING -->
+        <div class="section-panel" id="panel-footing">
+          <div class="field-group">
+            <label class="field-label" id="footing-length-label">Length (ft)</label>
+            <input type="number" class="field-input" id="footing-length" placeholder="e.g. 20" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="footing-width-label">Width (ft)</label>
+            <input type="number" class="field-input" id="footing-width" placeholder="e.g. 1.5" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="footing-depth-label">Depth (ft)</label>
+            <input type="number" class="field-input" id="footing-depth" placeholder="e.g. 1" min="0" oninput="calculate()" />
+          </div>
+        </div>
+
+        <!-- COLUMN -->
+        <div class="section-panel" id="panel-column">
+          <div class="field-group">
+            <label class="field-label" id="column-diameter-label">Diameter (in)</label>
+            <input type="number" class="field-input" id="column-diameter" placeholder="e.g. 10" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="column-depth-label">Depth / Height (ft)</label>
+            <input type="number" class="field-input" id="column-depth" placeholder="e.g. 3.5" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Number of Columns</label>
+            <input type="number" class="field-input" id="column-count" placeholder="e.g. 4" min="1" value="1" oninput="calculate()" />
+          </div>
+        </div>
+
+        <!-- STEPS -->
+        <div class="section-panel" id="panel-steps">
+          <div class="field-group">
+            <label class="field-label" id="steps-width-label">Width (ft)</label>
+            <input type="number" class="field-input" id="steps-width" placeholder="e.g. 4" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="steps-rise-label">Rise per Step (in)</label>
+            <input type="number" class="field-input" id="steps-rise" placeholder="e.g. 7" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" id="steps-run-label">Run per Step (in)</label>
+            <input type="number" class="field-input" id="steps-run" placeholder="e.g. 11" min="0" oninput="calculate()" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Number of Steps</label>
+            <input type="number" class="field-input" id="steps-count" placeholder="e.g. 3" min="1" value="3" oninput="calculate()" />
+          </div>
+        </div>
+
+        <!-- Waste factor -->
+        <div class="field-group">
+          <label class="field-label">Waste Factor</label>
+          <select class="field-input" id="waste-factor" onchange="calculate()">
+            <option value="1.05">5% — Flat slab, experienced crew</option>
+            <option value="1.10" selected>10% — Standard (recommended)</option>
+            <option value="1.15">15% — Complex shape or first-time pour</option>
+          </select>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()">Calculate</button>
+      </div>
+
+      <!-- RIGHT PANEL: RESULTS -->
+      <div class="calc-panel results-panel">
+        <h2 class="panel-title">Your Estimate</h2>
+
+        <div id="results-placeholder" class="results-placeholder">
+          <div class="placeholder-icon">🧱</div>
+          <p>Fill in your dimensions to see how much concrete you need.</p>
+        </div>
+
+        <div id="results-output" style="display:none;">
+
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="result-label">Cubic Yards</div>
+              <div class="result-value" id="res-yd3">—</div>
+              <div class="result-unit">yd³</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Cubic Meters</div>
+              <div class="result-value" id="res-m3">—</div>
+              <div class="result-unit">m³</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Cubic Feet</div>
+              <div class="result-value" id="res-ft3">—</div>
+              <div class="result-unit">ft³</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Concrete Tons</div>
+              <div class="result-value" id="res-tons">—</div>
+              <div class="result-unit">short tons</div>
+            </div>
+          </div>
+
+          <!-- Premix bags -->
+          <div class="bags-section">
+            <h4>Premix Bags Needed (if not ordering ready-mix)</h4>
+            <div class="bags-row">
+              <span>40 lb bags</span>
+              <span id="bags-40">—</span>
+            </div>
+            <div class="bags-row">
+              <span>60 lb bags</span>
+              <span id="bags-60">—</span>
+            </div>
+            <div class="bags-row">
+              <span>80 lb bags</span>
+              <span id="bags-80">—</span>
+            </div>
+          </div>
+
+          <!-- Legal notice -->
+          <div class="legal-notice">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+
+        <!-- Info section for SEO -->
+        <div class="info-section">
+          <h3>How to Calculate Concrete</h3>
+          <p>Concrete volume is measured in <strong>cubic yards</strong> in the US and <strong>cubic meters</strong> in the UK and most other countries. To find the volume of a rectangular slab, multiply length × width × thickness. A standard 4-inch residential driveway slab covering 10 ft × 12 ft requires approximately 1.48 cubic yards before adding a waste factor.</p>
+          <p>For round columns or tube forms, the calculator uses the formula for a cylinder: π × radius² × depth. Always add at least 10% for waste to account for spillage, uneven subgrade, and form irregularities.</p>
+          <h3>When to Order Ready-Mix vs. Premix Bags</h3>
+          <p>Ready-mix concrete (delivered by truck) is cost-effective for pours above 1 cubic yard. Below that threshold, premix bags from a home improvement store are often more practical. One 80 lb bag yields approximately 0.60 cubic feet of concrete.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 RenoPlot.com — Free Home Improvement Calculators</p>
+  </footer>
+
+  <script>
+    let currentShape = 'slab';
+    let currentUnits = 'imperial';
+
+    function setShape(shape, btn) {
+      currentShape = shape;
+      document.querySelectorAll('.shape-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + shape).classList.add('active');
+      updateLabels();
+      calculate();
+    }
+
+    function setUnits(units) {
+      currentUnits = units;
+      document.getElementById('btn-imperial').classList.toggle('active', units === 'imperial');
+      document.getElementById('btn-metric').classList.toggle('active', units === 'metric');
+      updateLabels();
+      calculate();
+    }
+
+    function updateLabels() {
+      const imp = currentUnits === 'imperial';
+      const L = imp ? 'ft' : 'm';
+      const D = imp ? 'in' : 'cm';
+
+      document.getElementById('slab-length-label').textContent = `Length (${L})`;
+      document.getElementById('slab-width-label').textContent = `Width (${L})`;
+      document.getElementById('slab-depth-label').textContent = `Thickness (${D})`;
+      document.getElementById('footing-length-label').textContent = `Length (${L})`;
+      document.getElementById('footing-width-label').textContent = `Width (${L})`;
+      document.getElementById('footing-depth-label').textContent = `Depth (${L})`;
+      document.getElementById('column-diameter-label').textContent = `Diameter (${D})`;
+      document.getElementById('column-depth-label').textContent = `Depth / Height (${L})`;
+      document.getElementById('steps-width-label').textContent = `Width (${L})`;
+      document.getElementById('steps-rise-label').textContent = `Rise per Step (${D})`;
+      document.getElementById('steps-run-label').textContent = `Run per Step (${D})`;
+    }
+
+    function getVal(id) {
+      return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function computeCubicFeet() {
+      const imp = currentUnits === 'imperial';
+
+      if (currentShape === 'slab') {
+        let l = getVal('slab-length');
+        let w = getVal('slab-width');
+        let d = getVal('slab-depth');
+        if (!imp) { l = l * 3.28084; w = w * 3.28084; d = d / 30.48; }
+        else { d = d / 12; }
+        return l * w * d;
+      }
+
+      if (currentShape === 'footing') {
+        let l = getVal('footing-length');
+        let w = getVal('footing-width');
+        let d = getVal('footing-depth');
+        if (!imp) { l *= 3.28084; w *= 3.28084; d *= 3.28084; }
+        return l * w * d;
+      }
+
+      if (currentShape === 'column') {
+        let dia = getVal('column-diameter');
+        let depth = getVal('column-depth');
+        let count = Math.max(1, getVal('column-count'));
+        if (!imp) { dia = dia / 30.48; depth = depth * 3.28084; }
+        else { dia = dia / 12; }
+        const r = dia / 2;
+        return Math.PI * r * r * depth * count;
+      }
+
+      if (currentShape === 'steps') {
+        let w = getVal('steps-width');
+        let rise = getVal('steps-rise');
+        let run = getVal('steps-run');
+        let n = Math.max(1, getVal('steps-count'));
+        if (!imp) { w *= 3.28084; rise = rise / 30.48; run = run / 30.48; }
+        else { rise = rise / 12; run = run / 12; }
+        return w * run * rise * (n * (n + 1) / 2);
+      }
+
+      return 0;
+    }
+
+    function calculate() {
+      const rawFt3 = computeCubicFeet();
+      const waste = parseFloat(document.getElementById('waste-factor').value) || 1.10;
+      const ft3 = rawFt3 * waste;
+
+      if (ft3 <= 0) {
+        document.getElementById('results-placeholder').style.display = '';
+        document.getElementById('results-output').style.display = 'none';
+        return;
+      }
+
+      const yd3 = ft3 / 27;
+      const m3 = ft3 * 0.0283168;
+      const tons = ft3 * 0.0561458;
+
+      const bags80 = Math.ceil(ft3 / 0.60);
+      const bags60 = Math.ceil(ft3 / 0.45);
+      const bags40 = Math.ceil(ft3 / 0.30);
+
+      document.getElementById('res-yd3').textContent = yd3.toFixed(2);
+      document.getElementById('res-m3').textContent = m3.toFixed(2);
+      document.getElementById('res-ft3').textContent = ft3.toFixed(1);
+      document.getElementById('res-tons').textContent = tons.toFixed(2);
+      document.getElementById('bags-80').textContent = bags80 + ' bags';
+      document.getElementById('bags-60').textContent = bags60 + ' bags';
+      document.getElementById('bags-40').textContent = bags40 + ' bags';
+
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-output').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
