@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tile Calculator — RenoPlot</title>
+  <meta name="description" content="Calculate exactly how many tiles and boxes you need for any room. Supports square and rectangular tiles, feet or meters, straight or diagonal layout.">
+  <link rel="stylesheet" href="../style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <style>
+    .toggle-group {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      width: 100%;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: var(--white);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      text-align: center;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      font-weight: 600;
+    }
+    .layout-group {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    .layout-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .layout-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
+    </div>
+  </header>
+
+  <div class="calc-page">
+    <div class="calc-page-header">
+      <nav class="breadcrumb">
+        <a href="/">Home</a> &rsaquo; Tile Calculator
+      </nav>
+      <h1 class="calc-page-title">Tile Calculator</h1>
+      <p class="calc-page-desc">Find out exactly how many tiles and boxes you need — supports any tile size, straight or diagonal layout, feet or meters.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Project Details</h2>
+
+        <div class="field">
+          <label>Unit System</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" onclick="setUnit('imperial')">Feet / Inches</button>
+            <button class="toggle-btn" onclick="setUnit('metric')">Meters / cm</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="label-room-w">Room Width (ft)</label>
+          <input type="number" id="room-width" min="0" step="0.01" placeholder="e.g. 12">
+        </div>
+        <div class="field">
+          <label id="label-room-l">Room Length (ft)</label>
+          <input type="number" id="room-length" min="0" step="0.01" placeholder="e.g. 15">
+        </div>
+
+        <div class="field">
+          <label id="label-exclude">Area to Exclude — cabinets, islands, etc. (ft²)</label>
+          <input type="number" id="exclude-area" min="0" step="0.01" placeholder="0 if none">
+        </div>
+
+        <div class="field">
+          <label id="label-tile-preset">Tile Size</label>
+          <select id="tile-preset" onchange="handlePreset()">
+            <option value="12x12">12 × 12 in</option>
+            <option value="18x18">18 × 18 in</option>
+            <option value="24x24">24 × 24 in</option>
+            <option value="12x24">12 × 24 in</option>
+            <option value="24x48">24 × 48 in</option>
+            <option value="custom">Custom size…</option>
+          </select>
+        </div>
+
+        <div id="custom-tile-fields" style="display:none;">
+          <div class="field-row">
+            <div class="field">
+              <label id="label-tile-w">Tile Width (in)</label>
+              <input type="number" id="tile-width" min="1" step="0.1" placeholder="e.g. 12">
+            </div>
+            <div class="field">
+              <label id="label-tile-h">Tile Height (in)</label>
+              <input type="number" id="tile-height" min="1" step="0.1" placeholder="e.g. 24">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Tiles per Box</label>
+          <input type="number" id="tiles-per-box" min="1" step="1" placeholder="e.g. 10" value="10">
+        </div>
+
+        <div class="field">
+          <label>Layout Pattern</label>
+          <div class="layout-group">
+            <button class="layout-btn active" onclick="setLayout('straight')">⬜ Straight</button>
+            <button class="layout-btn" onclick="setLayout('diagonal')">🔷 Diagonal</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Waste Factor — <span id="waste-display">10%</span></label>
+          <input type="range" id="waste-factor" min="5" max="20" step="1" value="10"
+            oninput="document.getElementById('waste-display').textContent = this.value + '%'">
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Tiles</button>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="panel" id="result-panel">
+        <h2 class="panel-title">Your Estimate</h2>
+        <div class="results-placeholder" id="placeholder">
+          <div class="results-placeholder-icon">🟦</div>
+          <p>Fill in your project details and click <strong>Calculate Tiles</strong>.</p>
+        </div>
+
+        <div id="results-output" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">TILES NEEDED</div>
+            <div class="result-number" id="res-tiles">0</div>
+            <div class="result-unit">tiles (incl. waste)</div>
+          </div>
+
+          <ul class="result-breakdown">
+            <li class="breakdown-item">
+              <span class="breakdown-label">Net area</span>
+              <span class="breakdown-value" id="res-area">—</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Tile area</span>
+              <span class="breakdown-value" id="res-tile-area">—</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Tiles without waste</span>
+              <span class="breakdown-value" id="res-tiles-base">—</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Waste factor</span>
+              <span class="breakdown-value" id="res-waste">—</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Boxes needed</span>
+              <span class="breakdown-value" id="res-boxes">—</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Tiles per box</span>
+              <span class="breakdown-value" id="res-per-box">—</span>
+            </li>
+          </ul>
+
+          <div class="result-note" id="res-diagonal-note" style="display:none;">
+            ⚠️ Diagonal layout adds extra cuts and waste. A 15% waste factor or higher is recommended.
+          </div>
+
+          <div class="disclaimer">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO INFO SECTION -->
+    <div class="info-section">
+      <h2>How to Calculate How Many Tiles You Need</h2>
+      <p>The basic formula is straightforward: divide the total area of the room by the area of a single tile, then add a waste factor to account for cuts and breakage.</p>
+
+      <h3>Step 1 — Measure the Room</h3>
+      <p>Multiply the width by the length to get the total square footage (or square meters). Subtract any areas that won't be tiled, such as kitchen islands, built-in cabinets, or bathtubs.</p>
+
+      <h3>Step 2 — Choose Your Waste Factor</h3>
+      <p>A straight grid layout typically needs 10% extra. A diagonal (45°) layout requires 15% or more because every perimeter tile must be cut at an angle, producing more offcuts. For irregular rooms or intricate patterns, go up to 20%.</p>
+
+      <h3>Step 3 — Find the Box Count</h3>
+      <p>Divide the total tile count by the number of tiles in each box, then always round up — you cannot buy a partial box. Buy one extra box if your budget allows; dye lots vary between production runs, and matching tiles later can be difficult.</p>
+
+      <h3>Common Tile Sizes Reference</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.9rem; margin-top:12px;">
+        <thead>
+          <tr style="background:#eff6ff; text-align:left;">
+            <th style="padding:10px 12px; border-bottom:1px solid #bfdbfe;">Size (in)</th>
+            <th style="padding:10px 12px; border-bottom:1px solid #bfdbfe;">Size (cm)</th>
+            <th style="padding:10px 12px; border-bottom:1px solid #bfdbfe;">Common Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">12 × 12</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">30 × 30</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Bathrooms, kitchens, general floor</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">18 × 18</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">45 × 45</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Living rooms, entryways</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">12 × 24</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">30 × 60</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Modern bathrooms, shower walls</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">24 × 24</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">60 × 60</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Large open spaces, commercial look</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;">24 × 48</td>
+            <td style="padding:10px 12px;">60 × 120</td>
+            <td style="padding:10px 12px;">Contemporary large-format floors</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+    </div>
+  </footer>
+
+  <script>
+    let unit = 'imperial';
+    let layout = 'straight';
+
+    const presets = {
+      imperial: {
+        '12x12': [12, 12],
+        '18x18': [18, 18],
+        '24x24': [24, 24],
+        '12x24': [12, 24],
+        '24x48': [24, 48],
+      },
+      metric: {
+        '12x12': [30, 30],
+        '18x18': [45, 45],
+        '24x24': [60, 60],
+        '12x24': [30, 60],
+        '24x48': [60, 120],
+      }
+    };
+
+    const presetLabels = {
+      imperial: {
+        '12x12': '12 × 12 in',
+        '18x18': '18 × 18 in',
+        '24x24': '24 × 24 in',
+        '12x24': '12 × 24 in',
+        '24x48': '24 × 48 in',
+        'custom': 'Custom size…'
+      },
+      metric: {
+        '12x12': '30 × 30 cm',
+        '18x18': '45 × 45 cm',
+        '24x24': '60 × 60 cm',
+        '12x24': '30 × 60 cm',
+        '24x48': '60 × 120 cm',
+        'custom': 'Custom size…'
+      }
+    };
+
+    function setUnit(u) {
+      unit = u;
+      document.querySelectorAll('.toggle-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && u === 'imperial') || (i === 1 && u === 'metric'));
+      });
+      const isImp = u === 'imperial';
+      document.getElementById('label-room-w').textContent = isImp ? 'Room Width (ft)' : 'Room Width (m)';
+      document.getElementById('label-room-l').textContent = isImp ? 'Room Length (ft)' : 'Room Length (m)';
+      document.getElementById('label-exclude').textContent = isImp ? 'Area to Exclude (ft²)' : 'Area to Exclude (m²)';
+      document.getElementById('label-tile-w').textContent = isImp ? 'Tile Width (in)' : 'Tile Width (cm)';
+      document.getElementById('label-tile-h').textContent = isImp ? 'Tile Height (in)' : 'Tile Height (cm)';
+      const sel = document.getElementById('tile-preset');
+      const labels = presetLabels[u];
+      Array.from(sel.options).forEach(opt => {
+        if (labels[opt.value]) opt.textContent = labels[opt.value];
+      });
+      handlePreset();
+      resetResults();
+    }
+
+    function handlePreset() {
+      const val = document.getElementById('tile-preset').value;
+      document.getElementById('custom-tile-fields').style.display = val === 'custom' ? 'block' : 'none';
+    }
+
+    function setLayout(l) {
+      layout = l;
+      document.querySelectorAll('.layout-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && l === 'straight') || (i === 1 && l === 'diagonal'));
+      });
+      if (l === 'diagonal') {
+        const w = document.getElementById('waste-factor');
+        if (parseInt(w.value) < 15) {
+          w.value = 15;
+          document.getElementById('waste-display').textContent = '15%';
+        }
+      }
+    }
+
+    function resetResults() {
+      document.getElementById('placeholder').style.display = 'flex';
+      document.getElementById('results-output').style.display = 'none';
+    }
+
+    function getTileDimensions() {
+      const val = document.getElementById('tile-preset').value;
+      if (val === 'custom') {
+        return [
+          parseFloat(document.getElementById('tile-width').value),
+          parseFloat(document.getElementById('tile-height').value)
+        ];
+      }
+      return presets[unit][val];
+    }
+
+    function animateNumber(el, target) {
+      const duration = 600;
+      const start = performance.now();
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * ease).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function calculate() {
+      const roomW = parseFloat(document.getElementById('room-width').value);
+      const roomL = parseFloat(document.getElementById('room-length').value);
+      const exclude = parseFloat(document.getElementById('exclude-area').value) || 0;
+      const tilesPerBox = parseInt(document.getElementById('tiles-per-box').value) || 1;
+      const waste = parseInt(document.getElementById('waste-factor').value) / 100;
+      const [tileW, tileH] = getTileDimensions();
+
+      if (!roomW || !roomL || !tileW || !tileH) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      let roomArea, tileAreaSqUnit, areaUnit, tileSizeLabel;
+
+      if (unit === 'imperial') {
+        roomArea = roomW * roomL;
+        tileAreaSqUnit = (tileW * tileH) / 144;
+        areaUnit = 'ft²';
+        tileSizeLabel = tileW + ' × ' + tileH + ' in';
+      } else {
+        roomArea = roomW * roomL;
+        tileAreaSqUnit = (tileW * tileH) / 10000;
+        areaUnit = 'm²';
+        tileSizeLabel = tileW + ' × ' + tileH + ' cm';
+      }
+
+      const netArea = Math.max(roomArea - exclude, 0);
+      const tilesBase = netArea / tileAreaSqUnit;
+      const wasteMultiplier = layout === 'diagonal' ? Math.max(waste, 0.15) : waste;
+      const tilesTotal = Math.ceil(tilesBase * (1 + wasteMultiplier));
+      const boxesNeeded = Math.ceil(tilesTotal / tilesPerBox);
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('results-output').style.display = 'block';
+
+      animateNumber(document.getElementById('res-tiles'), tilesTotal);
+      document.getElementById('res-area').textContent = netArea.toFixed(2) + ' ' + areaUnit;
+      document.getElementById('res-tile-area').textContent = tileAreaSqUnit.toFixed(4) + ' ' + areaUnit + ' (' + tileSizeLabel + ')';
+      document.getElementById('res-tiles-base').textContent = Math.ceil(tilesBase).toLocaleString() + ' tiles';
+      document.getElementById('res-waste').textContent = Math.round(wasteMultiplier * 100) + '%' + (layout === 'diagonal' && waste < 0.15 ? ' (adjusted for diagonal)' : '');
+      document.getElementById('res-boxes').textContent = boxesNeeded.toLocaleString() + ' boxes';
+      document.getElementById('res-per-box').textContent = tilesPerBox + ' tiles/box';
+
+      document.getElementById('res-diagonal-note').style.display = layout === 'diagonal' ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>
