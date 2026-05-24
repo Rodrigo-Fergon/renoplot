@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mulch Calculator – How Much Mulch Do I Need? | Renoplot</title>
+  <meta name="description" content="Calculate exactly how much mulch you need for your garden beds and landscaping. Get results in cubic yards, cubic feet, and bags. Free mulch calculator for US and UK.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <style>
+    .unit-toggle,
+    .shape-toggle {
+      display: flex;
+      gap: 0;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .toggle-btn:not(.active):hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .toggle-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <div class="logo-icon">⚒</div>
+        <div>
+          <div class="logo-text">Renoplot</div>
+          <div class="header-tagline">Home Improvement Calculators</div>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <main class="calc-page">
+
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a> &rsaquo; Mulch Calculator
+    </nav>
+
+    <div class="calc-page-header">
+      <h1 class="calc-page-title">Mulch Calculator</h1>
+      <p class="calc-page-desc">Find out exactly how much mulch you need for garden beds, trees, or landscaping — in cubic yards, cubic feet, or bags.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <div class="panel">
+        <h2 class="panel-title">Your Measurements</h2>
+
+        <div class="toggle-label">Units</div>
+        <div class="unit-toggle">
+          <button class="toggle-btn active" id="btn-imperial" onclick="setUnit('imperial')">Feet &amp; Inches</button>
+          <button class="toggle-btn" id="btn-metric" onclick="setUnit('metric')">Meters &amp; cm</button>
+        </div>
+
+        <div class="toggle-label">Bed Shape</div>
+        <div class="shape-toggle">
+          <button class="toggle-btn active" id="btn-rect" onclick="setShape('rectangle')">Rectangle</button>
+          <button class="toggle-btn" id="btn-circle" onclick="setShape('circle')">Circle</button>
+        </div>
+
+        <div id="fields-rectangle">
+          <div class="field-row">
+            <div class="field">
+              <label for="length">Length <span id="label-length">(ft)</span></label>
+              <input type="number" id="length" placeholder="e.g. 12" min="0" step="0.1">
+            </div>
+            <div class="field">
+              <label for="width">Width <span id="label-width">(ft)</span></label>
+              <input type="number" id="width" placeholder="e.g. 8" min="0" step="0.1">
+            </div>
+          </div>
+        </div>
+
+        <div id="fields-circle" style="display:none;">
+          <div class="field">
+            <label for="diameter">Diameter <span id="label-diameter">(ft)</span></label>
+            <input type="number" id="diameter" placeholder="e.g. 10" min="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="depth">Mulch Depth</label>
+          <select id="depth" onchange="toggleCustomDepth()">
+            <option value="">Select depth...</option>
+            <optgroup id="depth-imperial-group" label="Common depths (inches)">
+              <option value="1">1 inch – light refresher</option>
+              <option value="2">2 inches – annual top-up</option>
+              <option value="3">3 inches – new bed (recommended)</option>
+              <option value="4">4 inches – weed suppression</option>
+              <option value="custom">Custom depth...</option>
+            </optgroup>
+            <optgroup id="depth-metric-group" label="Common depths (cm)" style="display:none;">
+              <option value="2.5">2.5 cm – light refresher</option>
+              <option value="5">5 cm – annual top-up</option>
+              <option value="7.5">7.5 cm – new bed (recommended)</option>
+              <option value="10">10 cm – weed suppression</option>
+              <option value="custom">Custom depth...</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="field" id="custom-depth-field" style="display:none;">
+          <label for="custom-depth">Custom Depth <span id="label-depth-unit">(inches)</span></label>
+          <input type="number" id="custom-depth" placeholder="Enter depth" min="0.1" step="0.1">
+        </div>
+
+        <div class="field">
+          <label for="waste">Waste / Overage Factor</label>
+          <select id="waste">
+            <option value="0">0% – exact estimate</option>
+            <option value="0.05">5% – minor adjustments</option>
+            <option value="0.10" selected>10% – recommended buffer</option>
+            <option value="0.15">15% – uneven terrain</option>
+          </select>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Mulch &#8594;</button>
+
+        <div class="disclaimer" style="margin-top: 20px;">
+          Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Your Results</h2>
+
+        <div class="results-placeholder" id="results-placeholder">
+          <div class="results-placeholder-icon">🌿</div>
+          <p>Fill in your measurements<br>and hit Calculate.</p>
+        </div>
+
+        <div id="results-content" style="display:none;">
+
+          <div class="result-main">
+            <div class="result-label">Total Mulch Needed</div>
+            <div class="result-number" id="result-primary">0</div>
+            <div class="result-unit" id="result-primary-unit">cubic yards</div>
+          </div>
+
+          <ul class="result-breakdown">
+            <li class="breakdown-item">
+              <span class="breakdown-label">Area covered</span>
+              <span class="breakdown-value" id="bd-area">–</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Depth applied</span>
+              <span class="breakdown-value" id="bd-depth">–</span>
+            </li>
+            <li class="breakdown-item">
+              <span class="breakdown-label">Volume before overage</span>
+              <span class="breakdown-value" id="bd-volume-raw">–</span>
+            </li>
+            <li class="breakdown-item" id="bd-bags-2-row">
+              <span class="breakdown-label">2 cu ft bags needed</span>
+              <span class="breakdown-value" id="bd-bags-2">–</span>
+            </li>
+            <li class="breakdown-item" id="bd-bags-3-row">
+              <span class="breakdown-label">3 cu ft bags needed</span>
+              <span class="breakdown-value" id="bd-bags-3">–</span>
+            </li>
+            <li class="breakdown-item" id="bd-bags-60L-row" style="display:none;">
+              <span class="breakdown-label">60-litre bags needed</span>
+              <span class="breakdown-value" id="bd-bags-60L">–</span>
+            </li>
+          </ul>
+
+          <div class="result-note" id="result-note"></div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-section">
+      <h2>How Much Mulch Do I Need?</h2>
+      <p>The formula for mulch is simple: multiply your bed's length by its width to get the area, then multiply by the desired depth. Because mulch is sold by the cubic yard in the US (and by the cubic metre in the UK), the calculator converts the final volume into the right unit automatically.</p>
+      <p>For most garden beds, 3 inches (7.5 cm) is the sweet spot — deep enough to suppress weeds and retain moisture, but not so thick that water can't reach the roots. A 2-inch layer works well for annual refreshes when some old mulch is still in place.</p>
+
+      <h3>Mulch Depth Reference Guide</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#eff6ff;">
+            <th style="text-align:left; padding:10px 12px; border-bottom:2px solid #bfdbfe;">Depth</th>
+            <th style="text-align:left; padding:10px 12px; border-bottom:2px solid #bfdbfe;">Best For</th>
+            <th style="text-align:right; padding:10px 12px; border-bottom:2px solid #bfdbfe;">Cu Yds per 100 sq ft</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">1 inch</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Light refresher, thin top-up</td>
+            <td style="text-align:right; padding:10px 12px; border-bottom:1px solid #e2e8f0;">0.31</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">2 inches</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">Annual maintenance layer</td>
+            <td style="text-align:right; padding:10px 12px; border-bottom:1px solid #e2e8f0;">0.62</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">3 inches</td>
+            <td style="padding:10px 12px; border-bottom:1px solid #e2e8f0;">New beds – recommended depth</td>
+            <td style="text-align:right; padding:10px 12px; border-bottom:1px solid #e2e8f0;">0.93</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:10px 12px;">4 inches</td>
+            <td style="padding:10px 12px;">Heavy weed suppression</td>
+            <td style="text-align:right; padding:10px 12px;">1.23</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Types of Mulch and How They Affect Volume</h3>
+      <p>The type of mulch doesn't change the volume calculation, but it does affect how much it settles over time. Shredded wood and bark mulch can compress by 10–15% after rain, which is why adding a 10% overage is the standard recommendation. Rubber mulch settles very little. Stone and gravel don't compress at all but are harder to spread evenly on slopes.</p>
+
+      <h3>Bags vs. Bulk Delivery</h3>
+      <p>In the US, mulch is sold in 2 cu ft bags at most hardware stores (Home Depot, Lowe's). Bulk delivery by the cubic yard becomes cost-effective for orders above 3–4 cubic yards. In the UK, mulch is typically sold in 60-litre bags. The calculator shows both bag sizes to cover the most common options in each market.</p>
+
+      <h3>Tips for a Professional Finish</h3>
+      <p>Keep mulch 2–3 inches away from plant stems and tree trunks to prevent rot. Rake and loosen old mulch before adding a fresh layer. For sloped beds, use shredded bark rather than wood chips, which tend to wash away. Edge your beds with a spade before mulching for a clean, defined border.</p>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">⚒ Renoplot</div>
+      <p class="footer-text">&copy; 2025 Renoplot.com &mdash; Free Home Improvement Calculators</p>
+    </div>
+  </footer>
+
+  <script>
+    let currentUnit = 'imperial';
+    let currentShape = 'rectangle';
+
+    function setUnit(unit) {
+      currentUnit = unit;
+      const isImperial = unit === 'imperial';
+
+      document.getElementById('btn-imperial').classList.toggle('active', isImperial);
+      document.getElementById('btn-metric').classList.toggle('active', !isImperial);
+
+      document.getElementById('label-length').textContent = isImperial ? '(ft)' : '(m)';
+      document.getElementById('label-width').textContent = isImperial ? '(ft)' : '(m)';
+      document.getElementById('label-diameter').textContent = isImperial ? '(ft)' : '(m)';
+      document.getElementById('label-depth-unit').textContent = isImperial ? '(inches)' : '(cm)';
+
+      document.getElementById('depth-imperial-group').style.display = isImperial ? '' : 'none';
+      document.getElementById('depth-metric-group').style.display = isImperial ? 'none' : '';
+      document.getElementById('depth').value = '';
+      document.getElementById('custom-depth-field').style.display = 'none';
+
+      clearResults();
+    }
+
+    function setShape(shape) {
+      currentShape = shape;
+      document.getElementById('btn-rect').classList.toggle('active', shape === 'rectangle');
+      document.getElementById('btn-circle').classList.toggle('active', shape === 'circle');
+      document.getElementById('fields-rectangle').style.display = shape === 'rectangle' ? '' : 'none';
+      document.getElementById('fields-circle').style.display = shape === 'circle' ? '' : 'none';
+      clearResults();
+    }
+
+    function toggleCustomDepth() {
+      const val = document.getElementById('depth').value;
+      document.getElementById('custom-depth-field').style.display = val === 'custom' ? '' : 'none';
+    }
+
+    function clearResults() {
+      document.getElementById('results-placeholder').style.display = '';
+      document.getElementById('results-content').style.display = 'none';
+    }
+
+    function animateNumber(el, target, decimals) {
+      const duration = 600;
+      const start = performance.now();
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = (target * ease).toFixed(decimals);
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target.toFixed(decimals);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function calculate() {
+      const isImperial = currentUnit === 'imperial';
+
+      const depthSelect = document.getElementById('depth').value;
+      let depthVal;
+      if (depthSelect === 'custom') {
+        depthVal = parseFloat(document.getElementById('custom-depth').value);
+      } else {
+        depthVal = parseFloat(depthSelect);
+      }
+
+      if (!depthSelect || isNaN(depthVal) || depthVal <= 0) {
+        alert('Please select or enter a valid depth.');
+        return;
+      }
+
+      let area;
+      if (currentShape === 'rectangle') {
+        const l = parseFloat(document.getElementById('length').value);
+        const w = parseFloat(document.getElementById('width').value);
+        if (isNaN(l) || isNaN(w) || l <= 0 || w <= 0) {
+          alert('Please enter valid length and width values.');
+          return;
+        }
+        area = l * w;
+      } else {
+        const d = parseFloat(document.getElementById('diameter').value);
+        if (isNaN(d) || d <= 0) {
+          alert('Please enter a valid diameter.');
+          return;
+        }
+        area = Math.PI * Math.pow(d / 2, 2);
+      }
+
+      const waste = parseFloat(document.getElementById('waste').value);
+
+      if (isImperial) {
+        const depthFt = depthVal / 12;
+        const volumeRaw = area * depthFt;
+        const volumeWithWaste = volumeRaw * (1 + waste);
+        const cuYards = volumeWithWaste / 27;
+
+        animateNumber(document.getElementById('result-primary'), cuYards, 2);
+        document.getElementById('result-primary-unit').textContent = cuYards === 1 ? 'cubic yard' : 'cubic yards';
+
+        document.getElementById('bd-area').textContent = area.toFixed(1) + ' sq ft';
+        document.getElementById('bd-depth').textContent = depthVal + (depthVal === 1 ? ' inch' : ' inches');
+        document.getElementById('bd-volume-raw').textContent = volumeRaw.toFixed(2) + ' cu ft';
+
+        document.getElementById('bd-bags-2').textContent = Math.ceil(volumeWithWaste / 2) + ' bags';
+        document.getElementById('bd-bags-3').textContent = Math.ceil(volumeWithWaste / 3) + ' bags';
+
+        document.getElementById('bd-bags-2-row').style.display = '';
+        document.getElementById('bd-bags-3-row').style.display = '';
+        document.getElementById('bd-bags-60L-row').style.display = 'none';
+
+        document.getElementById('result-note').textContent =
+          cuYards >= 3
+            ? '💡 At ' + cuYards.toFixed(1) + ' cubic yards, bulk delivery is likely cheaper than buying bags. Ask your local supplier for a bulk price.'
+            : '💡 For smaller orders, bagged mulch from a hardware store is the most convenient option.';
+
+      } else {
+        const depthM = depthVal / 100;
+        const volumeRaw = area * depthM;
+        const volumeWithWaste = volumeRaw * (1 + waste);
+
+        animateNumber(document.getElementById('result-primary'), volumeWithWaste, 3);
+        document.getElementById('result-primary-unit').textContent = 'cubic metres';
+
+        document.getElementById('bd-area').textContent = area.toFixed(2) + ' m²';
+        document.getElementById('bd-depth').textContent = depthVal + ' cm';
+        document.getElementById('bd-volume-raw').textContent = volumeRaw.toFixed(3) + ' m³';
+
+        document.getElementById('bd-bags-60L').textContent = Math.ceil((volumeWithWaste * 1000) / 60) + ' bags';
+
+        document.getElementById('bd-bags-2-row').style.display = 'none';
+        document.getElementById('bd-bags-3-row').style.display = 'none';
+        document.getElementById('bd-bags-60L-row').style.display = '';
+
+        document.getElementById('result-note').textContent =
+          '💡 In the UK, mulch is commonly sold in 60-litre bags. For larger orders, bulk delivery by the cubic metre is more economical.';
+      }
+
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-content').style.display = '';
+    }
+  </script>
+
+</body>
+</html>
