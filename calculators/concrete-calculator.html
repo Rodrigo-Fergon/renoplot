@@ -6,7 +6,71 @@
   <title>Concrete Calculator — Free Concrete Estimator | RenoPlot</title>
   <meta name="description" content="Free concrete calculator for slabs, footings, columns, and steps. Get instant estimates in cubic yards, cubic meters, and number of bags. Waste factor included.">
   <link rel="stylesheet" href="../style.css">
-  <!-- Google Analytics -->
+  <style>
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .toggle-btn {
+      padding: 10px;
+      border: none;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .shape-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .shape-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .shape-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .shape-btn:hover:not(.active) {
+      border-color: #bfdbfe;
+      background: #f0f7ff;
+    }
+    .shape-icon { font-size: 18px; }
+    .disclaimer {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      color: #1e40af;
+      line-height: 1.55;
+    }
+  </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -17,7 +81,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="site-header">
     <div class="header-inner">
       <a href="../index.html" class="logo">
@@ -28,135 +91,128 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="calc-page">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <a href="../index.html">Home</a>
       <span>›</span>
       <span>Concrete Calculator</span>
     </nav>
 
-    <!-- Page title -->
-    <h1 class="calc-title">Concrete Calculator</h1>
-    <p class="calc-subtitle">Enter your project dimensions to estimate how much concrete you need — in cubic yards, cubic meters, and number of bags.</p>
+    <div class="calc-page-header">
+      <h1 class="calc-page-title">Concrete Calculator</h1>
+      <p class="calc-page-desc">Enter your project dimensions to estimate how much concrete you need — in cubic yards, cubic meters, and number of bags.</p>
+    </div>
 
-    <!-- Two-panel layout -->
-    <div class="calc-layout">
+    <div class="calc-panels">
 
-      <!-- LEFT PANEL: Inputs -->
-      <div class="calc-card">
-        <h2 class="card-heading">Project Details</h2>
-        <hr class="card-divider">
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Project Details</div>
 
-        <!-- Unit toggle -->
-        <div class="field-group">
-          <label class="field-label">Unit System</label>
+        <div class="field">
+          <label>Unit System</label>
           <div class="toggle-group">
             <button class="toggle-btn active" id="btn-imperial" onclick="setUnit('imperial')">Feet &amp; Inches</button>
             <button class="toggle-btn" id="btn-metric" onclick="setUnit('metric')">Meters</button>
           </div>
         </div>
 
-        <!-- Shape selector -->
-        <div class="field-group">
-          <label class="field-label">Shape</label>
+        <div class="field">
+          <label>Shape</label>
           <div class="shape-grid">
             <button class="shape-btn active" id="shape-slab" onclick="setShape('slab')">
-              <span class="shape-icon">⬜</span>
-              <span>Slab</span>
+              <span class="shape-icon">⬜</span>Slab
             </button>
             <button class="shape-btn" id="shape-footing" onclick="setShape('footing')">
-              <span class="shape-icon">▭</span>
-              <span>Footing</span>
+              <span class="shape-icon">▬</span>Footing
             </button>
             <button class="shape-btn" id="shape-column" onclick="setShape('column')">
-              <span class="shape-icon">⬤</span>
-              <span>Column</span>
+              <span class="shape-icon">⚫</span>Column
             </button>
             <button class="shape-btn" id="shape-steps" onclick="setShape('steps')">
-              <span class="shape-icon">⊏</span>
-              <span>Steps</span>
+              <span class="shape-icon">🪜</span>Steps
             </button>
           </div>
         </div>
 
-        <!-- Dynamic inputs -->
+        <!-- Slab -->
         <div id="inputs-slab">
           <div class="field-row">
-            <div class="field-group">
-              <label class="field-label" id="label-slab-length">Length (ft)</label>
-              <input class="field-input" type="number" id="slab-length" placeholder="e.g. 12" min="0">
+            <div class="field">
+              <label id="label-slab-length">Length (ft)</label>
+              <input type="number" id="slab-length" placeholder="e.g. 12" min="0">
             </div>
-            <div class="field-group">
-              <label class="field-label" id="label-slab-width">Width (ft)</label>
-              <input class="field-input" type="number" id="slab-width" placeholder="e.g. 10" min="0">
+            <div class="field">
+              <label id="label-slab-width">Width (ft)</label>
+              <input type="number" id="slab-width" placeholder="e.g. 10" min="0">
             </div>
           </div>
-          <div class="field-group">
-            <label class="field-label" id="label-slab-thickness">Thickness (in)</label>
-            <input class="field-input" type="number" id="slab-thickness" placeholder="e.g. 4" min="0">
+          <div class="field">
+            <label id="label-slab-thickness">Thickness (in)</label>
+            <input type="number" id="slab-thickness" placeholder="e.g. 4" min="0">
           </div>
         </div>
 
+        <!-- Footing -->
         <div id="inputs-footing" style="display:none;">
           <div class="field-row">
-            <div class="field-group">
-              <label class="field-label" id="label-footing-length">Length (ft)</label>
-              <input class="field-input" type="number" id="footing-length" placeholder="e.g. 20" min="0">
+            <div class="field">
+              <label id="label-footing-length">Length (ft)</label>
+              <input type="number" id="footing-length" placeholder="e.g. 20" min="0">
             </div>
-            <div class="field-group">
-              <label class="field-label" id="label-footing-width">Width (ft)</label>
-              <input class="field-input" type="number" id="footing-width" placeholder="e.g. 2" min="0">
+            <div class="field">
+              <label id="label-footing-width">Width (ft)</label>
+              <input type="number" id="footing-width" placeholder="e.g. 2" min="0">
             </div>
           </div>
-          <div class="field-group">
-            <label class="field-label" id="label-footing-depth">Depth (in)</label>
-            <input class="field-input" type="number" id="footing-depth" placeholder="e.g. 12" min="0">
+          <div class="field">
+            <label id="label-footing-depth">Depth (in)</label>
+            <input type="number" id="footing-depth" placeholder="e.g. 12" min="0">
           </div>
         </div>
 
+        <!-- Column -->
         <div id="inputs-column" style="display:none;">
           <div class="field-row">
-            <div class="field-group">
-              <label class="field-label" id="label-column-diameter">Diameter (in)</label>
-              <input class="field-input" type="number" id="column-diameter" placeholder="e.g. 10" min="0">
+            <div class="field">
+              <label id="label-column-diameter">Diameter (in)</label>
+              <input type="number" id="column-diameter" placeholder="e.g. 10" min="0">
             </div>
-            <div class="field-group">
-              <label class="field-label" id="label-column-height">Height (ft)</label>
-              <input class="field-input" type="number" id="column-height" placeholder="e.g. 8" min="0">
+            <div class="field">
+              <label id="label-column-height">Height (ft)</label>
+              <input type="number" id="column-height" placeholder="e.g. 8" min="0">
             </div>
           </div>
         </div>
 
+        <!-- Steps -->
         <div id="inputs-steps" style="display:none;">
           <div class="field-row">
-            <div class="field-group">
-              <label class="field-label" id="label-steps-width">Width (ft)</label>
-              <input class="field-input" type="number" id="steps-width" placeholder="e.g. 4" min="0">
+            <div class="field">
+              <label id="label-steps-width">Width (ft)</label>
+              <input type="number" id="steps-width" placeholder="e.g. 4" min="0">
             </div>
-            <div class="field-group">
-              <label class="field-label" id="label-steps-rise">Rise per step (in)</label>
-              <input class="field-input" type="number" id="steps-rise" placeholder="e.g. 7" min="0">
+            <div class="field">
+              <label id="label-steps-rise">Rise per step (in)</label>
+              <input type="number" id="steps-rise" placeholder="e.g. 7" min="0">
             </div>
           </div>
           <div class="field-row">
-            <div class="field-group">
-              <label class="field-label" id="label-steps-run">Run per step (in)</label>
-              <input class="field-input" type="number" id="steps-run" placeholder="e.g. 11" min="0">
+            <div class="field">
+              <label id="label-steps-run">Run per step (in)</label>
+              <input type="number" id="steps-run" placeholder="e.g. 11" min="0">
             </div>
-            <div class="field-group">
-              <label class="field-label">Number of Steps</label>
-              <input class="field-input" type="number" id="steps-count" placeholder="e.g. 3" min="0">
+            <div class="field">
+              <label>Number of Steps</label>
+              <input type="number" id="steps-count" placeholder="e.g. 3" min="0">
             </div>
           </div>
         </div>
 
-        <!-- Waste factor -->
-        <div class="field-group">
-          <label class="field-label">Waste Factor</label>
-          <select class="field-select" id="waste-factor">
+        <div class="field">
+          <label>Waste Factor</label>
+          <select id="waste-factor">
             <option value="1.05">5% — Minimal</option>
             <option value="1.10" selected>10% — Standard (recommended)</option>
             <option value="1.15">15% — Complex shapes</option>
@@ -164,62 +220,60 @@
           </select>
         </div>
 
-        <button class="calc-btn" onclick="calculate()">Calculate</button>
+        <button class="btn-calculate" onclick="calculate()">Calculate</button>
       </div>
 
-      <!-- RIGHT PANEL: Results -->
-      <div class="calc-card result-card">
-        <h2 class="card-heading">Your Estimate</h2>
-        <hr class="card-divider">
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Your Estimate</div>
 
-        <div id="result-placeholder" class="result-placeholder">
-          <span class="placeholder-icon">🧱</span>
+        <div id="result-placeholder" class="results-placeholder">
+          <span class="results-placeholder-icon">🧱</span>
           <p>Fill in your dimensions and click Calculate to see your concrete estimate.</p>
         </div>
 
         <div id="result-output" style="display:none;">
           <div class="result-main">
-            <div class="result-value" id="res-yd3">—</div>
-            <div class="result-unit">cubic yards</div>
+            <div class="result-label">Total Volume Needed</div>
+            <div class="result-number" id="res-yd3">—</div>
+            <div class="result-unit">cubic yards (yd³)</div>
           </div>
 
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="result-item-value" id="res-m3">—</div>
-              <div class="result-item-label">Cubic Meters (m³)</div>
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Cubic Meters (m³)</span>
+              <span class="breakdown-value" id="res-m3">—</span>
             </div>
-            <div class="result-item">
-              <div class="result-item-value" id="res-ft3">—</div>
-              <div class="result-item-label">Cubic Feet (ft³)</div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Cubic Feet (ft³)</span>
+              <span class="breakdown-value" id="res-ft3">—</span>
             </div>
-            <div class="result-item">
-              <div class="result-item-value" id="res-bags80">—</div>
-              <div class="result-item-label">Bags (80 lb)</div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Bags at 80 lb each</span>
+              <span class="breakdown-value" id="res-bags80">—</span>
             </div>
-            <div class="result-item">
-              <div class="result-item-value" id="res-bags60">—</div>
-              <div class="result-item-label">Bags (60 lb)</div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Bags at 60 lb each</span>
+              <span class="breakdown-value" id="res-bags60">—</span>
             </div>
-            <div class="result-item">
-              <div class="result-item-value" id="res-bags40">—</div>
-              <div class="result-item-label">Bags (40 lb)</div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Bags at 40 lb each</span>
+              <span class="breakdown-value" id="res-bags40">—</span>
             </div>
-            <div class="result-item">
-              <div class="result-item-value" id="res-tons">—</div>
-              <div class="result-item-label">Metric Tons</div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Metric Tons</span>
+              <span class="breakdown-value" id="res-tons">—</span>
             </div>
           </div>
 
-          <!-- Legal disclaimer -->
           <div class="disclaimer">
             ⚠️ Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
           </div>
         </div>
       </div>
 
-    </div><!-- end calc-layout -->
+    </div>
 
-    <!-- SEO informational section -->
     <section class="info-section">
       <h2>How to Calculate Concrete for Your Project</h2>
       <p>Concrete is sold by the cubic yard in the United States. To find out how many cubic yards you need, multiply the length, width, and thickness of your slab (all in feet), then divide by 27. Always add a 10% waste factor to account for spillage, uneven ground, and overpour.</p>
@@ -241,9 +295,11 @@
 
   </main>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
-    <p>© 2025 RenoPlot. All estimates are for reference only. Always consult a professional before purchasing materials.</p>
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot. All estimates are for reference only. Always consult a professional before purchasing materials.</p>
+    </div>
   </footer>
 
   <script>
@@ -269,18 +325,18 @@
     }
 
     function updateLabels() {
-      const isImperial = currentUnit === 'imperial';
-      document.getElementById('label-slab-length').textContent = isImperial ? 'Length (ft)' : 'Length (m)';
-      document.getElementById('label-slab-width').textContent = isImperial ? 'Width (ft)' : 'Width (m)';
-      document.getElementById('label-slab-thickness').textContent = isImperial ? 'Thickness (in)' : 'Thickness (cm)';
-      document.getElementById('label-footing-length').textContent = isImperial ? 'Length (ft)' : 'Length (m)';
-      document.getElementById('label-footing-width').textContent = isImperial ? 'Width (ft)' : 'Width (m)';
-      document.getElementById('label-footing-depth').textContent = isImperial ? 'Depth (in)' : 'Depth (cm)';
-      document.getElementById('label-column-diameter').textContent = isImperial ? 'Diameter (in)' : 'Diameter (cm)';
-      document.getElementById('label-column-height').textContent = isImperial ? 'Height (ft)' : 'Height (m)';
-      document.getElementById('label-steps-width').textContent = isImperial ? 'Width (ft)' : 'Width (m)';
-      document.getElementById('label-steps-rise').textContent = isImperial ? 'Rise per step (in)' : 'Rise per step (cm)';
-      document.getElementById('label-steps-run').textContent = isImperial ? 'Run per step (in)' : 'Run per step (cm)';
+      const imp = currentUnit === 'imperial';
+      document.getElementById('label-slab-length').textContent     = imp ? 'Length (ft)' : 'Length (m)';
+      document.getElementById('label-slab-width').textContent      = imp ? 'Width (ft)'  : 'Width (m)';
+      document.getElementById('label-slab-thickness').textContent  = imp ? 'Thickness (in)' : 'Thickness (cm)';
+      document.getElementById('label-footing-length').textContent  = imp ? 'Length (ft)' : 'Length (m)';
+      document.getElementById('label-footing-width').textContent   = imp ? 'Width (ft)'  : 'Width (m)';
+      document.getElementById('label-footing-depth').textContent   = imp ? 'Depth (in)'  : 'Depth (cm)';
+      document.getElementById('label-column-diameter').textContent = imp ? 'Diameter (in)' : 'Diameter (cm)';
+      document.getElementById('label-column-height').textContent   = imp ? 'Height (ft)' : 'Height (m)';
+      document.getElementById('label-steps-width').textContent     = imp ? 'Width (ft)'  : 'Width (m)';
+      document.getElementById('label-steps-rise').textContent      = imp ? 'Rise per step (in)' : 'Rise per step (cm)';
+      document.getElementById('label-steps-run').textContent       = imp ? 'Run per step (in)'  : 'Run per step (cm)';
     }
 
     function resetResults() {
@@ -290,69 +346,60 @@
 
     function calculate() {
       const waste = parseFloat(document.getElementById('waste-factor').value);
-      const isImperial = currentUnit === 'imperial';
-      let volumeFt3 = 0;
+      const imp = currentUnit === 'imperial';
+      let ft3 = 0;
 
       if (currentShape === 'slab') {
         const L = parseFloat(document.getElementById('slab-length').value);
         const W = parseFloat(document.getElementById('slab-width').value);
         const T = parseFloat(document.getElementById('slab-thickness').value);
         if (!L || !W || !T) return alert('Please fill in all dimensions.');
-        if (isImperial) {
-          volumeFt3 = L * W * (T / 12);
-        } else {
-          volumeFt3 = (L * 3.28084) * (W * 3.28084) * ((T / 100) * 3.28084);
-        }
+        ft3 = imp ? L * W * (T / 12) : (L * 3.28084) * (W * 3.28084) * ((T / 100) * 3.28084);
+
       } else if (currentShape === 'footing') {
         const L = parseFloat(document.getElementById('footing-length').value);
         const W = parseFloat(document.getElementById('footing-width').value);
         const D = parseFloat(document.getElementById('footing-depth').value);
         if (!L || !W || !D) return alert('Please fill in all dimensions.');
-        if (isImperial) {
-          volumeFt3 = L * W * (D / 12);
-        } else {
-          volumeFt3 = (L * 3.28084) * (W * 3.28084) * ((D / 100) * 3.28084);
-        }
+        ft3 = imp ? L * W * (D / 12) : (L * 3.28084) * (W * 3.28084) * ((D / 100) * 3.28084);
+
       } else if (currentShape === 'column') {
         const D = parseFloat(document.getElementById('column-diameter').value);
         const H = parseFloat(document.getElementById('column-height').value);
         if (!D || !H) return alert('Please fill in all dimensions.');
-        if (isImperial) {
+        if (imp) {
           const r = (D / 12) / 2;
-          volumeFt3 = Math.PI * r * r * H;
+          ft3 = Math.PI * r * r * H;
         } else {
-          const rFt = ((D / 100) * 3.28084) / 2;
-          const Hft = H * 3.28084;
-          volumeFt3 = Math.PI * rFt * rFt * Hft;
+          const r = ((D / 100) * 3.28084) / 2;
+          ft3 = Math.PI * r * r * (H * 3.28084);
         }
+
       } else if (currentShape === 'steps') {
-        const W = parseFloat(document.getElementById('steps-width').value);
-        const rise = parseFloat(document.getElementById('steps-rise').value);
-        const run = parseFloat(document.getElementById('steps-run').value);
+        const W     = parseFloat(document.getElementById('steps-width').value);
+        const rise  = parseFloat(document.getElementById('steps-rise').value);
+        const run   = parseFloat(document.getElementById('steps-run').value);
         const count = parseFloat(document.getElementById('steps-count').value);
         if (!W || !rise || !run || !count) return alert('Please fill in all dimensions.');
-        if (isImperial) {
-          volumeFt3 = W * (run / 12) * (rise / 12) * count * (count + 1) / 2;
+        if (imp) {
+          ft3 = W * (run / 12) * (rise / 12) * count * (count + 1) / 2;
         } else {
-          volumeFt3 = (W * 3.28084) * ((run / 100) * 3.28084) * ((rise / 100) * 3.28084) * count * (count + 1) / 2;
+          ft3 = (W * 3.28084) * ((run / 100) * 3.28084) * ((rise / 100) * 3.28084) * count * (count + 1) / 2;
         }
       }
 
-      const volumeWithWaste = volumeFt3 * waste;
-      const yd3 = volumeWithWaste / 27;
-      const m3 = volumeWithWaste * 0.0283168;
-      const tons = m3 * 2.4;
-      const bags80 = Math.ceil(volumeWithWaste / 0.60);
-      const bags60 = Math.ceil(volumeWithWaste / 0.45);
-      const bags40 = Math.ceil(volumeWithWaste / 0.30);
+      const total = ft3 * waste;
+      const yd3   = total / 27;
+      const m3    = total * 0.0283168;
+      const tons  = m3 * 2.4;
 
-      document.getElementById('res-yd3').textContent = yd3.toFixed(2) + ' yd³';
-      document.getElementById('res-m3').textContent = m3.toFixed(2) + ' m³';
-      document.getElementById('res-ft3').textContent = volumeWithWaste.toFixed(2) + ' ft³';
-      document.getElementById('res-tons').textContent = tons.toFixed(2) + ' t';
-      document.getElementById('res-bags80').textContent = bags80;
-      document.getElementById('res-bags60').textContent = bags60;
-      document.getElementById('res-bags40').textContent = bags40;
+      document.getElementById('res-yd3').textContent    = yd3.toFixed(2) + ' yd³';
+      document.getElementById('res-m3').textContent     = m3.toFixed(2) + ' m³';
+      document.getElementById('res-ft3').textContent    = total.toFixed(2) + ' ft³';
+      document.getElementById('res-bags80').textContent = Math.ceil(total / 0.60) + ' bags';
+      document.getElementById('res-bags60').textContent = Math.ceil(total / 0.45) + ' bags';
+      document.getElementById('res-bags40').textContent = Math.ceil(total / 0.30) + ' bags';
+      document.getElementById('res-tons').textContent   = tons.toFixed(2) + ' t';
 
       document.getElementById('result-placeholder').style.display = 'none';
       document.getElementById('result-output').style.display = 'block';
