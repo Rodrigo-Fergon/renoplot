@@ -157,8 +157,8 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="../index.html" class="logo">
-        <span class="logo-icon">📐</span>
-        <span class="logo-text">Renoplot</span>
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">Reno<span>Plot</span></span>
       </a>
       <span class="header-tagline">Home Improvement Calculators</span>
     </div>
@@ -395,7 +395,7 @@
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <div class="footer-logo">📐 Renoplot</div>
+      <div class="footer-logo">🏠 Reno<span>Plot</span></div>
       <p class="footer-text">Free home improvement calculators for the US and UK markets.<br />
         <a href="../index.html">Back to all calculators</a>
       </p>
@@ -530,17 +530,16 @@
 
     // ── Helpers de conversão ─────────────────────────────────
     function toFt(val, inches) {
-      // Sempre trabalha em ft² internamente; converte de metros se necessário
       const v = parseFloat(val) || 0;
       const i = parseFloat(inches) || 0;
       if (unit === 'imperial') return v + i / 12;
-      return v * 3.28084; // metros para pés
+      return v * 3.28084;
     }
 
     function toFt2(val) {
       const v = parseFloat(val) || 0;
       if (unit === 'imperial') return v;
-      return v * 10.7639; // m² para ft²
+      return v * 10.7639;
     }
 
     function fmt(n, decimals = 1) {
@@ -562,11 +561,10 @@
       if (sel === 'custom') {
         const w = parseFloat(document.getElementById('sheetW').value) || 0;
         const h = parseFloat(document.getElementById('sheetH').value) || 0;
-        // Se métrico, converter para ft
         if (unit === 'metric') return (w * 3.28084) * (h * 3.28084);
         return w * h;
       }
-      return parseFloat(sel); // já em ft²
+      return parseFloat(sel);
     }
 
     // ── Cálculo principal ────────────────────────────────────
@@ -574,7 +572,6 @@
       let wallAreaFt2 = 0;
       let ceilingAreaFt2 = 0;
 
-      // Paredes
       if (wallsEnabled) {
         if (wallMode === 'perimeter') {
           const p = toFt(document.getElementById('perimeter').value, document.getElementById('perimeterInches').value);
@@ -596,7 +593,6 @@
         }
       }
 
-      // Teto
       if (ceilingEnabled) {
         if (ceilingMode === 'dimensions') {
           const l = toFt(document.getElementById('ceilingLength').value, document.getElementById('ceilingLengthInches').value);
@@ -607,7 +603,6 @@
         }
       }
 
-      // Validação
       if (!wallsEnabled && !ceilingEnabled) {
         alert('Please enable at least one section (Walls or Ceiling).');
         return;
@@ -631,7 +626,6 @@
       const grossArea = netArea * waste;
       const sheets = Math.ceil(grossArea / sheetFt2);
 
-      // Exibir
       document.getElementById('placeholder').style.display = 'none';
       document.getElementById('resultsContent').style.display = '';
 
@@ -652,7 +646,6 @@
         : `You need ${sheets} sheets. Always buy a few extra for damage or future repairs.`;
       document.getElementById('resultNote').textContent = note;
 
-      // Scroll suave para resultado no mobile
       document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
