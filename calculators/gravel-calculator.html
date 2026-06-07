@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravel Calculator — Cubic Yards, Tons & Bags | RenoPlot</title>
+  <meta name="description" content="Calculate exactly how much gravel you need for driveways, garden paths, decorative beds, and drainage. Results in cubic yards, tons, and bags — US and UK units.">
+  <link rel="stylesheet" href="../style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <style>
+    /* Toggle buttons */
+    .toggle-group {
+      display: flex;
+      gap: 0;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      width: fit-content;
+    }
+    .toggle-btn {
+      padding: 0.45rem 1.1rem;
+      background: var(--white);
+      color: var(--text-secondary);
+      border: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Project type selector */
+    .project-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+    .project-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.75rem 0.5rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .project-btn .proj-icon {
+      font-size: 1.4rem;
+    }
+    .project-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .project-btn:hover:not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Depth hint */
+    .depth-hint {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+
+    /* Result cards */
+    .result-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .result-card {
+      background: #f0f7ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 0.75rem;
+      text-align: center;
+    }
+    .result-card .rc-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .result-card .rc-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .result-card .rc-unit {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .result-card.highlight {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .result-card.highlight .rc-label,
+    .result-card.highlight .rc-value,
+    .result-card.highlight .rc-unit {
+      color: #fff;
+    }
+
+    /* Compaction notice */
+    .compaction-notice {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: #92400e;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .compaction-notice strong {
+      color: #78350f;
+    }
+
+    /* Material tip */
+    .material-tip {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: #166534;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .result-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+      .project-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div class="calc-page-header">
+    <div class="breadcrumb"><a href="/">Home</a> › Gravel Calculator</div>
+    <h1 class="calc-page-title">Gravel Calculator</h1>
+    <p class="calc-page-desc">Find out exactly how much gravel you need — in cubic yards, tons, and bags. Covers driveways, garden paths, decorative beds, and drainage. Works in feet and meters.</p>
+  </div>
+
+  <!-- MAIN -->
+  <main class="calc-page">
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Your Project</h2>
+
+        <!-- Unit toggle -->
+        <div class="field">
+          <label>Units</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="btn-imperial" onclick="setUnit('imperial')">Feet / Inches</button>
+            <button class="toggle-btn" id="btn-metric" onclick="setUnit('metric')">Meters / cm</button>
+          </div>
+        </div>
+
+        <!-- Project type -->
+        <div class="field">
+          <label>What is this gravel for?</label>
+          <div class="project-grid">
+            <button class="project-btn active" id="proj-driveway" onclick="setProject('driveway')">
+              <span class="proj-icon">🚗</span>Driveway
+            </button>
+            <button class="project-btn" id="proj-path" onclick="setProject('path')">
+              <span class="proj-icon">🚶</span>Garden Path
+            </button>
+            <button class="project-btn" id="proj-bed" onclick="setProject('bed')">
+              <span class="proj-icon">🌸</span>Decorative Bed
+            </button>
+            <button class="project-btn" id="proj-drainage" onclick="setProject('drainage')">
+              <span class="proj-icon">💧</span>Drainage
+            </button>
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="field-row" id="row-length-width">
+          <div class="field">
+            <label id="label-length">Length (ft)</label>
+            <input type="number" id="inp-length" placeholder="e.g. 20" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label id="label-width">Width (ft)</label>
+            <input type="number" id="inp-width" placeholder="e.g. 10" min="0" step="0.1">
+          </div>
+        </div>
+
+        <!-- Depth -->
+        <div class="field">
+          <label id="label-depth">Depth (<span id="depth-unit-label">inches</span>)</label>
+          <input type="number" id="inp-depth" placeholder="" min="0" step="0.5">
+          <div class="depth-hint" id="depth-hint">Recommended for driveways: 4 inches minimum (6 inches preferred for heavy vehicles).</div>
+        </div>
+
+        <!-- Gravel type -->
+        <div class="field">
+          <label>Gravel Type</label>
+          <select id="sel-gravel">
+            <option value="crushed" data-density-imp="1.35">Crushed Stone / Gravel (best for driveways)</option>
+            <option value="pea" data-density-imp="1.25">Pea Gravel (walkways & decorative)</option>
+            <option value="river" data-density-imp="1.35">River Rock (decorative beds)</option>
+            <option value="lava" data-density-imp="0.85">Lava Rock / Scoria (lightweight, decorative)</option>
+            <option value="limestone" data-density-imp="1.45">Limestone / Caliche (drainage & base)</option>
+          </select>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Gravel Needed</button>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Results</h2>
+
+        <div id="results-placeholder" class="results-placeholder">
+          <div class="results-placeholder-icon">🪨</div>
+          <p>Fill in your project details and click Calculate.</p>
+        </div>
+
+        <div id="results-output" style="display:none;">
+
+          <!-- 4 result cards -->
+          <div class="result-cards">
+            <div class="result-card highlight">
+              <div class="rc-label" id="card1-label">Cubic Yards</div>
+              <div class="rc-value" id="card1-value">—</div>
+              <div class="rc-unit" id="card1-unit">yd³ (bulk order)</div>
+            </div>
+            <div class="result-card">
+              <div class="rc-label" id="card2-label">Tons</div>
+              <div class="rc-value" id="card2-value">—</div>
+              <div class="rc-unit" id="card2-unit">US tons</div>
+            </div>
+            <div class="result-card">
+              <div class="rc-label">Bags (US)</div>
+              <div class="rc-value" id="card3-value">—</div>
+              <div class="rc-unit">50 lb bags</div>
+            </div>
+            <div class="result-card">
+              <div class="rc-label">Bags (UK)</div>
+              <div class="rc-value" id="card4-value">—</div>
+              <div class="rc-unit">25 kg bags</div>
+            </div>
+          </div>
+
+          <!-- Compaction notice -->
+          <div class="compaction-notice" id="compaction-notice">
+            <strong>⚠️ Compaction included:</strong> These quantities already account for <span id="compaction-pct">15%</span> compaction and settling. Do not add extra — the estimate is ready to order.
+          </div>
+
+          <!-- Material tip -->
+          <div class="material-tip" id="material-tip">
+            <strong>💡 Material tip:</strong> <span id="tip-text"></span>
+          </div>
+
+          <!-- Breakdown -->
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Area</span>
+              <span class="breakdown-value" id="bd-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Depth</span>
+              <span class="breakdown-value" id="bd-depth">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Gravel type</span>
+              <span class="breakdown-value" id="bd-type">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Density used</span>
+              <span class="breakdown-value" id="bd-density">—</span>
+            </div>
+          </div>
+
+          <div class="result-note">Results include compaction factor. Always confirm units (tons vs cubic yards) with your supplier before ordering.</div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer" style="margin-top:1.5rem;">
+          Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+      <h2>How much gravel do I need?</h2>
+      <p>The amount of gravel depends on three things: the area you're covering, the depth you need, and the type of gravel. Different projects need different depths — a driveway needs at least 4 inches to handle vehicle weight, while a decorative garden bed only needs 2 to 3 inches.</p>
+
+      <h3>Recommended depths by project</h3>
+      <p>Driveways need a minimum of 4 inches of compacted gravel; 6 inches is better for heavier vehicles or soft ground. Garden paths and walkways work well at 2 to 3 inches. Decorative beds around plants and borders need 2 inches. French drains and drainage channels typically require 6 to 12 inches of clean gravel.</p>
+
+      <h3>Cubic yards vs. tons vs. bags</h3>
+      <p>Suppliers in the US sell bulk gravel either by the cubic yard (volume) or by the ton (weight). Always ask your supplier which unit they use before ordering. Small quantities are also available in 50 lb bags at home improvement stores — practical for projects under 1 cubic yard, but significantly more expensive per unit than bulk delivery. In the UK, bulk gravel is typically sold by the tonne (metric ton), with bag sizes of 25 kg being standard.</p>
+
+      <h3>Why gravel compacts</h3>
+      <p>Fresh gravel contains air gaps between the stones. Once spread and exposed to foot traffic, vehicle weight, or rain, those gaps compress — reducing the actual depth by 15% to 30% depending on gravel type. This calculator already accounts for that compaction, so the quantities shown are ready to order without adding an extra buffer.</p>
+
+      <h3>Choosing the right gravel type</h3>
+      <p>Crushed stone and crushed gravel are angular and lock together well, making them the standard choice for driveways and high-traffic areas. Pea gravel is smooth and round — comfortable underfoot on paths but not suitable for driveways because it shifts. River rock is decorative and works well in beds and borders. Lava rock is very lightweight and good for low-maintenance decorative areas. Limestone and caliche are common base materials for drainage systems and subbase layers.</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+    </div>
+  </footer>
+
+  <script>
+    // State
+    let unit = 'imperial'; // 'imperial' | 'metric'
+    let project = 'driveway';
+
+    // Project config: depth in inches (imperial) and cm (metric), compaction %, tip text
+    const projectConfig = {
+      driveway: {
+        depthImp: 4,
+        depthMet: 10,
+        hintImp: 'Recommended for driveways: 4 inches minimum (6 inches preferred for heavy vehicles).',
+        hintMet: 'Recommended for driveways: 10 cm minimum (15 cm preferred for heavy vehicles).',
+        compaction: 0.20,
+        tip: 'Crushed stone is the best choice for driveways — its angular edges lock together and resist shifting under vehicle weight.'
+      },
+      path: {
+        depthImp: 2,
+        depthMet: 5,
+        hintImp: 'Recommended for garden paths: 2–3 inches.',
+        hintMet: 'Recommended for garden paths: 5–8 cm.',
+        compaction: 0.15,
+        tip: 'Pea gravel is comfortable underfoot and works well on garden paths. Avoid it on slopes — it shifts easily.'
+      },
+      bed: {
+        depthImp: 2,
+        depthMet: 5,
+        hintImp: 'Recommended for decorative beds: 2 inches.',
+        hintMet: 'Recommended for decorative beds: 5 cm.',
+        compaction: 0.10,
+        tip: 'River rock and lava rock are popular for decorative beds. Lava rock is very lightweight — great for large areas where weight matters.'
+      },
+      drainage: {
+        depthImp: 8,
+        depthMet: 20,
+        hintImp: 'Recommended for drainage: 6–12 inches of clean gravel.',
+        hintMet: 'Recommended for drainage: 15–30 cm of clean gravel.',
+        compaction: 0.15,
+        tip: 'For drainage, use clean crushed stone or limestone — the angular pieces allow water to flow freely through the gaps.'
+      }
+    };
+
+    // Gravel density in tons/yd³ (imperial)
+    const densityMap = {
+      crushed: 1.35,
+      pea: 1.25,
+      river: 1.35,
+      lava: 0.85,
+      limestone: 1.45
+    };
+
+    // Gravel type display name
+    const gravel_name = {
+      crushed: 'Crushed Stone / Gravel',
+      pea: 'Pea Gravel',
+      river: 'River Rock',
+      lava: 'Lava Rock / Scoria',
+      limestone: 'Limestone / Caliche'
+    };
+
+    function setUnit(u) {
+      unit = u;
+      document.getElementById('btn-imperial').classList.toggle('active', u === 'imperial');
+      document.getElementById('btn-metric').classList.toggle('active', u === 'metric');
+      updateLabels();
+    }
+
+    function setProject(p) {
+      project = p;
+      ['driveway','path','bed','drainage'].forEach(id => {
+        document.getElementById('proj-' + id).classList.toggle('active', id === p);
+      });
+      updateLabels();
+    }
+
+    function updateLabels() {
+      const cfg = projectConfig[project];
+      if (unit === 'imperial') {
+        document.getElementById('label-length').textContent = 'Length (ft)';
+        document.getElementById('label-width').textContent = 'Width (ft)';
+        document.getElementById('label-depth').innerHTML = 'Depth (<span id="depth-unit-label">inches</span>)';
+        document.getElementById('depth-hint').textContent = cfg.hintImp;
+        document.getElementById('inp-depth').value = cfg.depthImp;
+        document.getElementById('inp-depth').placeholder = cfg.depthImp;
+      } else {
+        document.getElementById('label-length').textContent = 'Length (m)';
+        document.getElementById('label-width').textContent = 'Width (m)';
+        document.getElementById('label-depth').innerHTML = 'Depth (<span id="depth-unit-label">cm</span>)';
+        document.getElementById('depth-hint').textContent = cfg.hintMet;
+        document.getElementById('inp-depth').value = cfg.depthMet;
+        document.getElementById('inp-depth').placeholder = cfg.depthMet;
+      }
+    }
+
+    function calculate() {
+      const length = parseFloat(document.getElementById('inp-length').value);
+      const width  = parseFloat(document.getElementById('inp-width').value);
+      const depth  = parseFloat(document.getElementById('inp-depth').value);
+      const gravelKey = document.getElementById('sel-gravel').value;
+
+      if (!length || !width || !depth || length <= 0 || width <= 0 || depth <= 0) {
+        alert('Please enter valid dimensions for length, width, and depth.');
+        return;
+      }
+
+      const cfg = projectConfig[project];
+      const compactionFactor = 1 + cfg.compaction;
+      const densityTonsPerYd3 = densityMap[gravelKey];
+
+      let volumeYd3, areaDisplay, depthDisplay;
+
+      if (unit === 'imperial') {
+        // depth in inches → feet
+        const depthFt = depth / 12;
+        const volumeFt3 = length * width * depthFt;
+        volumeYd3 = (volumeFt3 / 27) * compactionFactor;
+        areaDisplay = (length * width).toFixed(1) + ' sq ft';
+        depthDisplay = depth + ' inches';
+      } else {
+        // metric: length & width in meters, depth in cm → meters
+        const depthM = depth / 100;
+        const volumeM3 = length * width * depthM;
+        // 1 m³ = 1.308 yd³
+        volumeYd3 = (volumeM3 * 1.308) * compactionFactor;
+        areaDisplay = (length * width).toFixed(2) + ' m²';
+        depthDisplay = depth + ' cm';
+      }
+
+      // Derived quantities
+      const tons_us   = volumeYd3 * densityTonsPerYd3;                 // US short tons
+      const lbs_total = tons_us * 2000;
+      const bags_50lb = Math.ceil(lbs_total / 50);
+      const kg_total  = tons_us * 907.185;                             // US ton → kg
+      const bags_25kg = Math.ceil(kg_total / 25);
+
+      // Metric display
+      const volumeM3_display = (volumeYd3 / 1.308).toFixed(2);
+      const tonnes_metric = (tons_us * 0.907185).toFixed(2);           // metric tonnes
+
+      // Determine display mode
+      if (unit === 'imperial') {
+        document.getElementById('card1-label').textContent = 'Cubic Yards';
+        document.getElementById('card1-value').textContent = volumeYd3.toFixed(2);
+        document.getElementById('card1-unit').textContent = 'yd³ (bulk order)';
+        document.getElementById('card2-label').textContent = 'US Tons';
+        document.getElementById('card2-value').textContent = tons_us.toFixed(2);
+        document.getElementById('card2-unit').textContent = 'short tons';
+      } else {
+        document.getElementById('card1-label').textContent = 'Cubic Meters';
+        document.getElementById('card1-value').textContent = volumeM3_display;
+        document.getElementById('card1-unit').textContent = 'm³ (bulk order)';
+        document.getElementById('card2-label').textContent = 'Tonnes';
+        document.getElementById('card2-value').textContent = tonnes_metric;
+        document.getElementById('card2-unit').textContent = 'metric tonnes';
+      }
+
+      document.getElementById('card3-value').textContent = bags_50lb.toLocaleString();
+      document.getElementById('card4-value').textContent = bags_25kg.toLocaleString();
+
+      // Compaction notice
+      document.getElementById('compaction-pct').textContent = (cfg.compaction * 100).toFixed(0) + '%';
+
+      // Material tip
+      document.getElementById('tip-text').textContent = cfg.tip;
+
+      // Breakdown
+      document.getElementById('bd-area').textContent = areaDisplay;
+      document.getElementById('bd-depth').textContent = depthDisplay;
+      document.getElementById('bd-type').textContent = gravel_name[gravelKey];
+      document.getElementById('bd-density').textContent = densityTonsPerYd3 + ' tons/yd³';
+
+      // Show results
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-output').style.display = 'block';
+    }
+
+    // Init
+    updateLabels();
+  </script>
+</body>
+</html>
