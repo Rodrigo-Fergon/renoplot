@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wallpaper Calculator – How Many Rolls Do I Need? | RenoPlot</title>
+  <meta name="description" content="Calculate exactly how many wallpaper rolls you need. Supports US and UK roll sizes, pattern repeat types, and straight or half-drop matching. Free and instant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Market toggle (US / UK) */
+    .market-toggle {
+      display: flex;
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      gap: 4px;
+      width: fit-content;
+      margin-bottom: 8px;
+    }
+    .market-toggle button {
+      padding: 6px 20px;
+      border: none;
+      border-radius: calc(var(--radius-sm) - 2px);
+      background: transparent;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .market-toggle button.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* Match type selector */
+    .match-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .match-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--white);
+    }
+    .match-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-option input[type="radio"] {
+      margin-top: 3px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+    .match-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary, #1e293b);
+    }
+    .match-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      line-height: 1.4;
+    }
+
+    /* Tooltip for pattern repeat field */
+    .field-with-tip {
+      position: relative;
+    }
+    .tip-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 5px;
+      border: none;
+      vertical-align: middle;
+    }
+    .tip-box {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #1e293b;
+      color: #f1f5f9;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tip-box.visible {
+      display: block;
+    }
+    .tip-box::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 16px;
+      width: 10px;
+      height: 10px;
+      background: #1e293b;
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    /* Result alert for batch number */
+    .result-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 16px;
+    }
+    .result-alert-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .result-alert-text {
+      font-size: 0.8rem;
+      color: #92400e;
+      line-height: 1.5;
+    }
+    .result-alert-text strong {
+      color: #78350f;
+    }
+
+    /* Opening note about doors/windows */
+    .opening-note {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">RenoPlot</span>
+      </a>
+      <span class="header-tagline">Home Improvement Calculators</span>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div class="calc-page-header">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a> › Wallpaper Calculator
+    </div>
+    <h1 class="calc-page-title">Wallpaper Calculator</h1>
+    <p class="calc-page-desc">Enter your room dimensions, choose your roll size and pattern type, and get an accurate roll count — including waste for pattern matching.</p>
+  </div>
+
+  <!-- MAIN PANELS -->
+  <main class="calc-page">
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Room &amp; Wallpaper Details</h2>
+
+        <!-- Market toggle -->
+        <div class="field">
+          <label>Roll Size Standard</label>
+          <div class="market-toggle">
+            <button id="btn-us" class="active" onclick="setMarket('us')">🇺🇸 US</button>
+            <button id="btn-uk" onclick="setMarket('uk')">🇬🇧 UK</button>
+          </div>
+          <div class="opening-note" id="market-note">
+            US double roll selected: approx. 57 sq ft (5.3 m²) per roll — the most common format sold in American stores.
+          </div>
+        </div>
+
+        <!-- Room dimensions -->
+        <div class="field">
+          <label>Units</label>
+          <select id="units" onchange="syncUnits()">
+            <option value="ft">Feet &amp; Inches</option>
+            <option value="m">Meters</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label id="lbl-length">Room Length</label>
+            <input type="number" id="room-length" placeholder="e.g. 12" min="0" step="0.1" />
+          </div>
+          <div class="field">
+            <label id="lbl-width">Room Width</label>
+            <input type="number" id="room-width" placeholder="e.g. 10" min="0" step="0.1" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="lbl-height">Wall Height</label>
+          <input type="number" id="wall-height" placeholder="e.g. 8" min="0" step="0.1" />
+        </div>
+
+        <!-- Number of doors and windows — with honest note -->
+        <div class="field-row">
+          <div class="field">
+            <label>Number of Doors</label>
+            <input type="number" id="num-doors" placeholder="e.g. 1" min="0" step="1" value="0" />
+          </div>
+          <div class="field">
+            <label>Number of Windows</label>
+            <input type="number" id="num-windows" placeholder="e.g. 2" min="0" step="1" value="0" />
+          </div>
+        </div>
+        <div class="opening-note">
+          Doors and windows are only deducted when they are large (patio doors, bay windows). For standard sizes, you'll still need full strips above and below each opening — so the calculator applies a partial credit only, as professional decorators recommend.
+        </div>
+
+        <!-- Pattern match type -->
+        <div class="field" style="margin-top: 16px;">
+          <label>Pattern Match Type</label>
+          <div class="match-selector" id="match-selector">
+            <label class="match-option selected">
+              <input type="radio" name="match" value="none" checked onchange="updateMatchSelection()" />
+              <div>
+                <div class="match-label">No Pattern / Random Match</div>
+                <div class="match-desc">Solid colors or textures with no vertical repeat. Minimal waste — each strip can start at any point on the roll.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="match" value="straight" onchange="updateMatchSelection()" />
+              <div>
+                <div class="match-label">Straight Match</div>
+                <div class="match-desc">The pattern repeats horizontally at the same height on every strip. Each new strip must begin at the same point in the pattern — some of the roll is lost at each cut.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="match" value="halfdrop" onchange="updateMatchSelection()" />
+              <div>
+                <div class="match-label">Half-Drop Match</div>
+                <div class="match-desc">The pattern shifts down by half a repeat on alternating strips. More complex alignment means more waste per strip — budget for at least one extra roll.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pattern repeat field with tooltip -->
+        <div class="field field-with-tip" id="repeat-field" style="display:none; margin-top: 4px;">
+          <label>
+            Pattern Repeat
+            <button class="tip-trigger" onclick="toggleTip()" type="button" aria-label="Where to find pattern repeat">?</button>
+          </label>
+          <div class="tip-box" id="tip-box">
+            Look at the label on your wallpaper roll or the product page online. You'll see a symbol that looks like two overlapping squares, followed by a measurement in inches or cm. That number is your pattern repeat. If you see "0" or a dash, your wallpaper has no repeat — select "No Pattern" above instead.
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="number" id="pattern-repeat" placeholder="e.g. 18" min="0" step="0.5" style="flex:1;" />
+            <select id="repeat-unit" style="width:80px;">
+              <option value="in">in</option>
+              <option value="cm">cm</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Rolls</button>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Your Estimate</h2>
+
+        <div class="results-placeholder" id="results-placeholder">
+          <div class="results-placeholder-icon">🖼️</div>
+          <p>Fill in your room details and click <strong>Calculate Rolls</strong> to see how many rolls you need.</p>
+        </div>
+
+        <div id="results-output" style="display:none;">
+
+          <div class="result-main">
+            <div class="result-label">Rolls to Buy</div>
+            <div class="result-number" id="res-rolls">0</div>
+            <div class="result-unit">rolls</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Total wall area</span>
+              <span class="breakdown-value" id="res-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Usable area per roll</span>
+              <span class="breakdown-value" id="res-per-roll">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Waste factor applied</span>
+              <span class="breakdown-value" id="res-waste">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Roll standard used</span>
+              <span class="breakdown-value" id="res-standard">—</span>
+            </div>
+          </div>
+
+          <div class="result-note" id="res-note"></div>
+
+          <!-- Batch number alert -->
+          <div class="result-alert">
+            <div class="result-alert-icon">⚠️</div>
+            <div class="result-alert-text">
+              <strong>Buy all rolls at once from the same batch.</strong> Wallpaper is produced in print runs, and color, texture, and weight can vary between batches — even for the same pattern. The batch number is printed on the roll label. If you need to reorder later, matching the exact batch is often impossible.
+            </div>
+          </div>
+
+          <div class="disclaimer" style="margin-top: 16px;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- INFO SECTION -->
+  <section class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Measure the length and width of your room at floor level, and the height from floor to ceiling (or picture rail). Enter the number of standard doors and windows — the calculator applies a professional partial credit for openings rather than removing them entirely, because you still need full wallpaper strips above and below each door and window.</p>
+
+    <h2>What Is Pattern Repeat?</h2>
+    <p>Pattern repeat is the vertical distance after which a design starts again on the wallpaper roll. You'll find this number on the roll label or the product page, usually marked with a symbol that looks like two overlapping squares. A repeat of 0 means no alignment is needed. Larger repeats (25 cm / 10 in or more) increase waste significantly because each strip must be cut to start at the same point in the pattern.</p>
+
+    <h2>Straight Match vs. Half-Drop</h2>
+    <p>With a <strong>straight match</strong>, every strip starts at the same height in the pattern — the motif lines up horizontally across the wall. With a <strong>half-drop</strong>, alternating strips shift down by exactly half a repeat, creating a diagonal feel. Half-drop patterns are common in large florals and geometrics, and they waste more material because the offset cuts leave larger off-cuts at the top or bottom of each strip.</p>
+
+    <h2>US vs. UK Roll Sizes</h2>
+    <p>In the United States, wallpaper is typically sold in double rolls (also called a bolt), which cover approximately 57 square feet (5.3 m²). Single rolls are rarely sold individually. In the United Kingdom, the standard roll measures 10.05 m long by 530 mm wide, covering about 5.3 m² — which happens to be almost identical in area, but the strip length and width differ, affecting how many drops you get per roll.</p>
+
+    <h2>Why You Should Never Run Out Mid-Job</h2>
+    <p>Running short of wallpaper mid-room is one of the most common and costly decorating mistakes. Reordering even a single roll risks getting a different print batch — and the color difference, though subtle, becomes visible once the paper is on the wall. The calculator rounds up and includes a safety margin for this reason. Order everything at once, keep at least one spare roll, and store it flat.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">🏠 RenoPlot</div>
+      <p class="footer-text">Free home improvement calculators for US and UK projects.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── State ───────────────────────────────────────────────────────────────
+    let market = 'us'; // 'us' or 'uk'
+
+    // Roll specs
+    const ROLL = {
+      us: { sqft: 57, sqm: 5.3, label: 'US double roll (~57 sq ft / 5.3 m²)' },
+      uk: { sqft: 57.3, sqm: 5.32, label: 'UK standard roll (10.05 m × 530 mm)' }
+    };
+
+    // Standard opening deductions (partial credit — professional practice)
+    // Door: deduct 50% of a standard door area (0.9 m × 2.0 m = 1.8 m²)
+    // Window: deduct 50% of a standard window area (1.0 m × 1.2 m = 1.2 m²)
+    const DOOR_DEDUCT_M2 = 0.9;  // 50% of 1.8 m²
+    const WIN_DEDUCT_M2  = 0.6;  // 50% of 1.2 m²
+
+    // Waste factors
+    const WASTE = {
+      none:     { factor: 1.10, label: '10% (no pattern)' },
+      straight: { factor: 1.20, label: '20% (straight match)' },
+      halfdrop: { factor: 1.30, label: '30% (half-drop match)' }
+    };
+
+    // ─── Market toggle ────────────────────────────────────────────────────────
+    function setMarket(m) {
+      market = m;
+      document.getElementById('btn-us').classList.toggle('active', m === 'us');
+      document.getElementById('btn-uk').classList.toggle('active', m === 'uk');
+      document.getElementById('market-note').textContent = m === 'us'
+        ? 'US double roll selected: approx. 57 sq ft (5.3 m²) per roll — the most common format sold in American stores.'
+        : 'UK standard roll selected: 10.05 m × 530 mm, approx. 5.3 m² per roll — the format used by B&Q, Dunelm, Cole & Son, and most UK suppliers.';
+    }
+
+    // ─── Units sync ───────────────────────────────────────────────────────────
+    function syncUnits() {
+      const ft = document.getElementById('units').value === 'ft';
+      const ph = ft ? 'e.g. 12' : 'e.g. 3.6';
+      const phH = ft ? 'e.g. 8' : 'e.g. 2.4';
+      document.getElementById('room-length').placeholder = ph;
+      document.getElementById('room-width').placeholder = ph;
+      document.getElementById('wall-height').placeholder = phH;
+      document.getElementById('lbl-length').textContent = ft ? 'Room Length (ft)' : 'Room Length (m)';
+      document.getElementById('lbl-width').textContent  = ft ? 'Room Width (ft)'  : 'Room Width (m)';
+      document.getElementById('lbl-height').textContent = ft ? 'Wall Height (ft)' : 'Wall Height (m)';
+    }
+
+    // ─── Match type selection ─────────────────────────────────────────────────
+    function updateMatchSelection() {
+      const options = document.querySelectorAll('.match-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        opt.classList.toggle('selected', radio.checked);
+      });
+      const val = document.querySelector('input[name="match"]:checked').value;
+      const repeatField = document.getElementById('repeat-field');
+      repeatField.style.display = (val === 'none') ? 'none' : 'block';
+    }
+
+    // ─── Pattern repeat tooltip ───────────────────────────────────────────────
+    function toggleTip() {
+      document.getElementById('tip-box').classList.toggle('visible');
+    }
+    document.addEventListener('click', function(e) {
+      const tip = document.getElementById('tip-box');
+      if (!e.target.closest('.field-with-tip')) tip.classList.remove('visible');
+    });
+
+    // ─── Main calculation ─────────────────────────────────────────────────────
+    function calculate() {
+      const units  = document.getElementById('units').value;
+      const len    = parseFloat(document.getElementById('room-length').value);
+      const wid    = parseFloat(document.getElementById('room-width').value);
+      const ht     = parseFloat(document.getElementById('wall-height').value);
+      const doors  = parseInt(document.getElementById('num-doors').value)  || 0;
+      const windows= parseInt(document.getElementById('num-windows').value)|| 0;
+      const match  = document.querySelector('input[name="match"]:checked').value;
+
+      if (!len || !wid || !ht || len <= 0 || wid <= 0 || ht <= 0) {
+        alert('Please enter valid room dimensions before calculating.');
+        return;
+      }
+
+      // Convert all to meters
+      const toM = v => units === 'ft' ? v * 0.3048 : v;
+      const lenM = toM(len);
+      const widM = toM(wid);
+      const htM  = toM(ht);
+
+      // Wall area = perimeter × height
+      const perimeter = 2 * (lenM + widM);
+      let wallArea = perimeter * htM;
+
+      // Partial deduction for openings
+      wallArea -= doors   * DOOR_DEDUCT_M2;
+      wallArea -= windows * WIN_DEDUCT_M2;
+      wallArea = Math.max(wallArea, 0);
+
+      // Pattern repeat adjustment
+      let adjustedArea = wallArea;
+      if (match !== 'none') {
+        const repeatVal  = parseFloat(document.getElementById('pattern-repeat').value) || 0;
+        const repeatUnit = document.getElementById('repeat-unit').value;
+        const repeatM    = repeatUnit === 'in' ? repeatVal * 0.0254 : repeatVal * 0.01;
+        if (repeatM > 0 && htM > 0) {
+          // Effective drop = ceiling of (height / repeat) * repeat
+          const dropsNeeded = Math.ceil(htM / repeatM);
+          const effectiveHt = dropsNeeded * repeatM;
+          const ratio = effectiveHt / htM;
+          adjustedArea = wallArea * ratio;
+        }
+      }
+
+      // Waste factor
+      const { factor: wasteFactor, label: wasteLabel } = WASTE[match];
+      const totalWithWaste = adjustedArea * wasteFactor;
+
+      // Roll coverage
+      const rollSqm = ROLL[market].sqm;
+      const rollsRaw = totalWithWaste / rollSqm;
+      const rolls = Math.ceil(rollsRaw);
+
+      // Half-drop safety: add 1 roll
+      const finalRolls = (match === 'halfdrop') ? rolls + 1 : rolls;
+
+      // Format areas
+      const areaLabel = units === 'ft'
+        ? `${(wallArea * 10.764).toFixed(1)} sq ft (${wallArea.toFixed(2)} m²)`
+        : `${wallArea.toFixed(2)} m² (${(wallArea * 10.764).toFixed(1)} sq ft)`;
+
+      const perRollLabel = units === 'ft'
+        ? `${(rollSqm * 10.764).toFixed(0)} sq ft (${rollSqm} m²)`
+        : `${rollSqm} m² (${(rollSqm * 10.764).toFixed(0)} sq ft)`;
+
+      // Note
+      let note = '';
+      if (match === 'halfdrop') {
+        note = 'Half-drop patterns require careful alignment — one extra roll has been added as a professional safety margin beyond the standard waste factor.';
+      } else if (match === 'straight') {
+        note = 'Straight match waste is included. If your pattern repeat is larger than 50 cm (20 in), consider ordering one additional roll.';
+      }
+
+      // ─── Render ───────────────────────────────────────────────────────────
+      document.getElementById('results-placeholder').style.display = 'none';
+      const output = document.getElementById('results-output');
+      output.style.display = 'block';
+
+      // Animate number
+      animateNumber('res-rolls', finalRolls);
+      document.getElementById('res-area').textContent      = areaLabel;
+      document.getElementById('res-per-roll').textContent  = perRollLabel;
+      document.getElementById('res-waste').textContent     = wasteLabel;
+      document.getElementById('res-standard').textContent  = ROLL[market].label;
+      document.getElementById('res-note').textContent      = note;
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 20));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 40);
+    }
+
+    // Init
+    syncUnits();
+  </script>
+
+</body>
+</html>
