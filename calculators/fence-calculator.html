@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fence Calculator – How Many Posts, Panels &amp; Rails Do You Need? | RenoPlot</title>
+  <meta name="description" content="Calculate exactly how many fence posts, panels, rails, and concrete bags you need. Supports wood, pre-built panels, and chain link, in US and UK units. Free and instant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Market toggle (US / UK) */
+    .market-toggle {
+      display: flex;
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      gap: 4px;
+      width: fit-content;
+      margin-bottom: 8px;
+    }
+    .market-toggle button {
+      padding: 6px 20px;
+      border: none;
+      border-radius: calc(var(--radius-sm) - 2px);
+      background: transparent;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .market-toggle button.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* Fence type selector */
+    .match-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .match-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--white);
+    }
+    .match-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-option input[type="radio"] {
+      margin-top: 3px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+    .match-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary, #1e293b);
+    }
+    .match-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      line-height: 1.4;
+    }
+
+    /* Tooltip for post spacing field */
+    .field-with-tip {
+      position: relative;
+    }
+    .tip-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 5px;
+      border: none;
+      vertical-align: middle;
+    }
+    .tip-box {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #1e293b;
+      color: #f1f5f9;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tip-box.visible {
+      display: block;
+    }
+    .tip-box::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 16px;
+      width: 10px;
+      height: 10px;
+      background: #1e293b;
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    /* Result alert for concrete curing */
+    .result-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 16px;
+    }
+    .result-alert-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .result-alert-text {
+      font-size: 0.8rem;
+      color: #92400e;
+      line-height: 1.5;
+    }
+    .result-alert-text strong {
+      color: #78350f;
+    }
+
+    /* Opening note style (reused for assumptions) */
+    .opening-note {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* Dynamic breakdown row spacing (built via JS) */
+    #dynamic-breakdown .breakdown-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">RenoPlot</span>
+      </a>
+      <span class="header-tagline">Home Improvement Calculators</span>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div class="calc-page-header">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a> › Fence Calculator
+    </div>
+    <h1 class="calc-page-title">Fence Calculator</h1>
+    <p class="calc-page-desc">Choose your fence type, enter your measurements, and get an accurate materials list — posts, concrete, panels or pickets, and gates included.</p>
+  </div>
+
+  <!-- MAIN PANELS -->
+  <main class="calc-page">
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Fence Details</h2>
+
+        <!-- Market toggle -->
+        <div class="field">
+          <label>Measurement Standard</label>
+          <div class="market-toggle">
+            <button id="btn-us" class="active" onclick="setMarket('us')">🇺🇸 US</button>
+            <button id="btn-uk" onclick="setMarket('uk')">🇬🇧 UK</button>
+          </div>
+          <div class="opening-note" id="market-note">
+            US units selected: feet for length, 50 lb bags for post concrete.
+          </div>
+        </div>
+
+        <!-- Fence type -->
+        <div class="field" style="margin-top: 16px;">
+          <label>Fence Type</label>
+          <div class="match-selector" id="type-selector">
+            <label class="match-option selected">
+              <input type="radio" name="fencetype" value="wood" checked onchange="updateTypeSelection()" />
+              <div>
+                <div class="match-label">Wood – Board by Board</div>
+                <div class="match-desc">Built on-site from individual posts, rails, and pickets. Most flexible for custom heights and privacy styles.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="fencetype" value="panels" onchange="updateTypeSelection()" />
+              <div>
+                <div class="match-label">Pre-Built Panels</div>
+                <div class="match-desc">Ready-made wood or vinyl sections installed between posts. Faster install, fixed panel widths.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="fencetype" value="chainlink" onchange="updateTypeSelection()" />
+              <div>
+                <div class="match-label">Chain Link</div>
+                <div class="match-desc">Galvanized or vinyl-coated mesh fencing sold by the length, with posts spaced further apart.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Panel size (only for "panels" type) -->
+        <div class="field" id="panel-size-field" style="display:none;">
+          <label>Panel Size</label>
+          <select id="panel-size"></select>
+        </div>
+
+        <!-- Total length -->
+        <div class="field" style="margin-top: 4px;">
+          <label id="lbl-length">Total Fence Length (ft)</label>
+          <input type="number" id="fence-length" placeholder="e.g. 150" min="0" step="0.1" />
+          <div class="opening-note">Measure the full perimeter of your fence run, including any gate openings.</div>
+        </div>
+
+        <!-- Height -->
+        <div class="field">
+          <label id="lbl-height">Fence Height (ft)</label>
+          <input type="number" id="fence-height" placeholder="e.g. 6" min="0" step="0.1" />
+        </div>
+
+        <!-- Post spacing (hidden for panels, since panel width defines spacing) -->
+        <div class="field field-with-tip" id="spacing-field">
+          <label>
+            <span id="lbl-spacing">Post Spacing (ft)</span>
+            <button class="tip-trigger" onclick="toggleTip()" type="button" aria-label="What is post spacing">?</button>
+          </label>
+          <div class="tip-box" id="tip-box">
+            Distance between the center of one post and the next. Pre-filled with the standard spacing for your fence type — adjust only if your design specifies something different.
+          </div>
+          <input type="number" id="post-spacing" step="0.1" />
+        </div>
+
+        <!-- Gates -->
+        <div class="field-row" style="margin-top: 12px;">
+          <div class="field">
+            <label>Number of Gates</label>
+            <input type="number" id="num-gates" value="0" min="0" step="1" onchange="toggleGateWidth()" />
+          </div>
+          <div class="field" id="gate-width-field" style="display:none;">
+            <label id="lbl-gatewidth">Gate Width (ft)</label>
+            <input type="number" id="gate-width" step="0.1" />
+          </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Materials</button>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="panel">
+        <h2 class="panel-title">Your Estimate</h2>
+
+        <div class="results-placeholder" id="results-placeholder">
+          <div class="results-placeholder-icon">🚧</div>
+          <p>Fill in your fence details and click <strong>Calculate Materials</strong> to see your full materials list.</p>
+        </div>
+
+        <div id="results-output" style="display:none;">
+
+          <div class="result-main">
+            <div class="result-label">Posts Needed</div>
+            <div class="result-number" id="res-posts">0</div>
+            <div class="result-unit">posts</div>
+          </div>
+
+          <div class="result-breakdown" id="dynamic-breakdown">
+            <!-- Rows inserted by JS -->
+          </div>
+
+          <div class="result-note" id="res-note"></div>
+
+          <div class="result-alert">
+            <div class="result-alert-icon">⏳</div>
+            <div class="result-alert-text">
+              <strong>Let post concrete cure 24–48 hours</strong> before attaching rails, panels, or mesh. Building on freshly set posts can knock them out of alignment before the concrete reaches working strength.
+            </div>
+          </div>
+
+          <div class="disclaimer" style="margin-top: 16px;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- INFO SECTION -->
+  <section class="info-section">
+    <h2>How to Measure Your Fence Run</h2>
+    <p>Walk the planned fence line with a tape measure or measuring wheel, and add up the length of every straight section, including corners. Include the width of any gate openings in this total — the calculator accounts for them separately when estimating posts and material.</p>
+
+    <h2>Wood vs. Panels vs. Chain Link</h2>
+    <p>A <strong>board-by-board wood fence</strong> is built from individual posts, horizontal rails, and pickets or boards nailed in place — it offers the most flexibility for custom heights and styles but takes longer to install. <strong>Pre-built panels</strong> arrive as ready-made sections in fixed widths (commonly 6 ft or 8 ft in the US, 1.8 m or 2.4 m in the UK), which speeds up installation but limits how finely you can adjust spacing. <strong>Chain link</strong> uses a continuous roll of mesh fabric stretched between posts spaced further apart, making it the fastest and most economical option for boundary fencing.</p>
+
+    <h2>Why Gate Posts Need Extra Support</h2>
+    <p>Gate posts carry the weight of the gate itself plus the stress of repeated swinging, so they're typically set deeper and with more concrete than standard line posts. This calculator adds one dedicated gate post per gate beyond the standard spacing count to reflect that extra structural demand.</p>
+
+    <h2>How Much Concrete Per Post?</h2>
+    <p>A typical fence post needs about two bags of concrete to set properly, depending on hole depth and post size. As a rule of thumb, plan to bury at least one-third of the total post length in the ground — for a 6 ft fence, that means an 8 ft post with roughly 2 ft set below grade.</p>
+
+    <h2>US vs. UK Fence Standards</h2>
+    <p>In the United States, wood fence posts are typically spaced 8 ft apart and concrete is sold in 50 lb bags. In the United Kingdom, post spacing is commonly measured in 2.4 m runs to match standard panel sizes, and post-fixing concrete is sold in 25 kg bags. This calculator switches both the units and the underlying defaults automatically based on the standard you select.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">🏠 RenoPlot</div>
+      <p class="footer-text">Free home improvement calculators for US and UK projects.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── State ───────────────────────────────────────────────────────────────
+    let market = 'us'; // 'us' or 'uk'
+    let fenceType = 'wood'; // 'wood' | 'panels' | 'chainlink'
+
+    // Default post spacing by type & market
+    const SPACING_DEFAULTS = {
+      wood:      { us: 8,   uk: 2.4 },
+      chainlink: { us: 10,  uk: 3 }
+      // panels: spacing = panel size, handled separately
+    };
+
+    // Panel size options by market
+    const PANEL_SIZES = {
+      us: [ { value: 6, label: '6 ft panels' }, { value: 8, label: '8 ft panels' } ],
+      uk: [ { value: 1.8, label: '1.8 m panels' }, { value: 2.4, label: '2.4 m panels' } ]
+    };
+
+    const CONCRETE_BAGS_PER_POST = 2;
+    const CONCRETE_UNIT_LABEL = { us: '50 lb bags', uk: '25 kg bags' };
+
+    // ─── Market toggle ────────────────────────────────────────────────────────
+    function setMarket(m) {
+      market = m;
+      document.getElementById('btn-us').classList.toggle('active', m === 'us');
+      document.getElementById('btn-uk').classList.toggle('active', m === 'uk');
+      document.getElementById('market-note').textContent = m === 'us'
+        ? 'US units selected: feet for length, 50 lb bags for post concrete.'
+        : 'UK units selected: meters for length, 25 kg bags for post concrete.';
+      refreshUnitLabels();
+      populatePanelSizes();
+      applySpacingDefault();
+    }
+
+    function refreshUnitLabels() {
+      const unit = market === 'us' ? 'ft' : 'm';
+      document.getElementById('lbl-length').textContent = `Total Fence Length (${unit})`;
+      document.getElementById('lbl-height').textContent = `Fence Height (${unit})`;
+      document.getElementById('lbl-spacing').textContent = `Post Spacing (${unit})`;
+      document.getElementById('lbl-gatewidth').textContent = `Gate Width (${unit})`;
+      document.getElementById('fence-length').placeholder = market === 'us' ? 'e.g. 150' : 'e.g. 45';
+      document.getElementById('fence-height').placeholder = market === 'us' ? 'e.g. 6' : 'e.g. 1.8';
+      document.getElementById('gate-width').placeholder = market === 'us' ? 'e.g. 4' : 'e.g. 1.2';
+      document.getElementById('gate-width').value = market === 'us' ? 4 : 1.2;
+    }
+
+    function populatePanelSizes() {
+      const sel = document.getElementById('panel-size');
+      sel.innerHTML = '';
+      PANEL_SIZES[market].forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.label;
+        sel.appendChild(o);
+      });
+      sel.onchange = applySpacingDefault;
+    }
+
+    // ─── Fence type selection ─────────────────────────────────────────────────
+    function updateTypeSelection() {
+      const options = document.querySelectorAll('#type-selector .match-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        opt.classList.toggle('selected', radio.checked);
+      });
+      fenceType = document.querySelector('input[name="fencetype"]:checked').value;
+
+      const isPanels = fenceType === 'panels';
+      document.getElementById('panel-size-field').style.display = isPanels ? 'block' : 'none';
+      document.getElementById('spacing-field').style.display = isPanels ? 'none' : 'block';
+
+      applySpacingDefault();
+    }
+
+    function applySpacingDefault() {
+      let spacing;
+      if (fenceType === 'panels') {
+        spacing = parseFloat(document.getElementById('panel-size').value) || PANEL_SIZES[market][0].value;
+      } else {
+        spacing = SPACING_DEFAULTS[fenceType][market];
+      }
+      document.getElementById('post-spacing').value = spacing;
+    }
+
+    // ─── Gate width toggle ────────────────────────────────────────────────────
+    function toggleGateWidth() {
+      const gates = parseInt(document.getElementById('num-gates').value) || 0;
+      document.getElementById('gate-width-field').style.display = gates > 0 ? 'block' : 'none';
+    }
+
+    // ─── Tooltip ──────────────────────────────────────────────────────────────
+    function toggleTip() {
+      document.getElementById('tip-box').classList.toggle('visible');
+    }
+    document.addEventListener('click', function(e) {
+      const tip = document.getElementById('tip-box');
+      if (!e.target.closest('.field-with-tip')) tip.classList.remove('visible');
+    });
+
+    // ─── Main calculation ─────────────────────────────────────────────────────
+    function calculate() {
+      const totalLength = parseFloat(document.getElementById('fence-length').value);
+      const height       = parseFloat(document.getElementById('fence-height').value);
+      const spacing       = parseFloat(document.getElementById('post-spacing').value);
+      const numGates       = parseInt(document.getElementById('num-gates').value) || 0;
+      const gateWidth     = numGates > 0 ? (parseFloat(document.getElementById('gate-width').value) || 0) : 0;
+
+      if (!totalLength || totalLength <= 0 || !height || height <= 0 || !spacing || spacing <= 0) {
+        alert('Please enter valid fence length, height, and post spacing before calculating.');
+        return;
+      }
+
+      const materialLength = Math.max(totalLength - (numGates * gateWidth), 0);
+
+      // Posts
+      const sections   = Math.ceil(totalLength / spacing);
+      const basePosts  = sections + 1;
+      const gateExtra  = numGates; // one dedicated gate post per gate
+      const totalPosts = basePosts + gateExtra;
+
+      // Concrete
+      const concreteBags = totalPosts * CONCRETE_BAGS_PER_POST;
+
+      // Unit label
+      const unit = market === 'us' ? 'ft' : 'm';
+
+      // Breakdown rows (common)
+      const rows = [
+        { label: 'Total fence length', value: `${totalLength.toFixed(1)} ${unit}` },
+        { label: 'Material needed (excl. gates)', value: `${materialLength.toFixed(1)} ${unit}` },
+        { label: 'Post spacing used', value: `${spacing} ${unit}` },
+        { label: `Concrete (${CONCRETE_UNIT_LABEL[market]})`, value: `${concreteBags} bags` }
+      ];
+
+      let note = '';
+
+      // Type-specific
+      if (fenceType === 'wood') {
+        const railsPerSection = height <= (market === 'us' ? 4 : 1.2) ? 2
+                               : height <= (market === 'us' ? 8 : 2.4) ? 3
+                               : 4;
+        const totalRails = sections * railsPerSection;
+
+        const picketWidth = market === 'us' ? 5.5 : 14;   // in or cm
+        const picketUnit  = market === 'us' ? 'in' : 'cm';
+        const lengthInPicketUnit = market === 'us' ? materialLength * 12 : materialLength * 100;
+        const pickets = Math.ceil(lengthInPicketUnit / picketWidth);
+        const screws = pickets * railsPerSection * 2;
+
+        rows.push({ label: 'Rails per section', value: `${railsPerSection}` });
+        rows.push({ label: 'Total rails', value: `${totalRails}` });
+        rows.push({ label: `Pickets (${picketWidth}${picketUnit} solid boards)`, value: `${pickets}` });
+        rows.push({ label: 'Screws (approx.)', value: `${screws}` });
+
+        note = 'Pickets assume a solid privacy style with no gap between boards. For a spaced picket fence, you will need fewer boards than shown here.';
+
+      } else if (fenceType === 'panels') {
+        const panelSize = parseFloat(document.getElementById('panel-size').value);
+        const panels = Math.ceil(materialLength / panelSize);
+
+        rows.push({ label: 'Panel size', value: `${panelSize} ${unit}` });
+        rows.push({ label: 'Panels needed', value: `${panels}` });
+        rows.push({ label: 'Post caps', value: `${totalPosts}` });
+
+        note = 'Panel count assumes full-size panels only. If your fence length is not an exact multiple of the panel size, the last panel will need to be trimmed on site.';
+
+      } else if (fenceType === 'chainlink') {
+        const meshLength = materialLength * 1.05; // 5% overlap/waste
+
+        rows.push({ label: 'Mesh fabric needed (incl. 5% overlap)', value: `${meshLength.toFixed(1)} ${unit}` });
+        rows.push({ label: 'Top rail length', value: `${materialLength.toFixed(1)} ${unit}` });
+        rows.push({ label: 'Tension wire (bottom, optional)', value: `${materialLength.toFixed(1)} ${unit}` });
+
+        note = 'Posts shown combine terminal and line posts. Corner and gate posts are typically heavier gauge than standard line posts — check this with your supplier.';
+      }
+
+      // ─── Render ───────────────────────────────────────────────────────────
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-output').style.display = 'block';
+
+      animateNumber('res-posts', totalPosts);
+
+      const container = document.getElementById('dynamic-breakdown');
+      container.innerHTML = rows.map(r => `
+        <div class="breakdown-item">
+          <span class="breakdown-label">${r.label}</span>
+          <span class="breakdown-value">${r.value}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('res-note').textContent = note;
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 20));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 40);
+    }
+
+    // ─── Init ───────────────────────────────────────────────────────────────
+    refreshUnitLabels();
+    populatePanelSizes();
+    applySpacingDefault();
+    toggleGateWidth();
+  </script>
+
+</body>
+</html>
