@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="../style.css" />
 
   <style>
-    /* Toggle de unidade */
     .unit-toggle {
       display: flex;
       background: var(--bg-secondary, #f1f5f9);
@@ -38,8 +37,6 @@
       color: var(--primary, #2563eb);
       box-shadow: 0 1px 4px rgba(0,0,0,0.10);
     }
-
-    /* Seletor de modo de entrada */
     .mode-selector {
       display: flex;
       flex-wrap: wrap;
@@ -64,8 +61,6 @@
       border-color: var(--primary, #2563eb);
       color: var(--primary, #2563eb);
     }
-
-    /* Seção colapsável */
     .section-toggle {
       display: flex;
       align-items: center;
@@ -84,7 +79,6 @@
       color: #1e293b;
       cursor: pointer;
     }
-
     .section-block {
       border: 1.5px solid var(--border, #e2e8f0);
       border-radius: 10px;
@@ -96,7 +90,6 @@
       opacity: 0.45;
       pointer-events: none;
     }
-
     .section-label {
       font-size: 0.78rem;
       font-weight: 600;
@@ -105,8 +98,6 @@
       color: var(--primary, #2563eb);
       margin-bottom: 0.75rem;
     }
-
-    /* Campo de polegadas extra */
     .inches-row {
       display: flex;
       gap: 8px;
@@ -119,8 +110,6 @@
     .inches-row .field label {
       font-size: 0.78rem;
     }
-
-    /* Paredes individuais */
     .wall-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -136,8 +125,6 @@
       color: #64748b;
       margin-bottom: 0.4rem;
     }
-
-    /* Resultado */
     .result-sheets {
       font-size: 2.6rem;
       font-weight: 700;
@@ -175,11 +162,9 @@
 
     <div class="calc-panels">
 
-      <!-- PAINEL DE ENTRADA -->
       <div class="panel">
         <h2 class="panel-title">Measurements</h2>
 
-        <!-- Unidade -->
         <div class="field">
           <label>Unit system</label>
           <div class="unit-toggle">
@@ -188,7 +173,6 @@
           </div>
         </div>
 
-        <!-- PAREDES -->
         <div class="section-toggle">
           <input type="checkbox" id="chkWalls" checked onchange="toggleSection('walls')" />
           <label for="chkWalls">Walls</label>
@@ -202,7 +186,6 @@
             <button class="mode-btn" onclick="setWallMode('total')">Total area</button>
           </div>
 
-          <!-- Modo: perímetro + altura -->
           <div id="wallModePerimeter">
             <div class="field" id="perimeterField">
               <label>Room perimeter (<span class="unit-label-long">ft</span>)</label>
@@ -222,7 +205,6 @@
             </div>
           </div>
 
-          <!-- Modo: parede por parede -->
           <div id="wallModeIndividual" style="display:none;">
             <div class="field">
               <label>Wall height (<span class="unit-label-height2">ft</span>)</label>
@@ -235,7 +217,6 @@
             <div id="wallRows"></div>
           </div>
 
-          <!-- Modo: área total -->
           <div id="wallModeTotal" style="display:none;">
             <div class="field">
               <label>Total wall area (<span class="unit-label-area">ft²</span>)</label>
@@ -244,7 +225,6 @@
           </div>
         </div>
 
-        <!-- TETO -->
         <div class="section-toggle">
           <input type="checkbox" id="chkCeiling" onchange="toggleSection('ceiling')" />
           <label for="chkCeiling">Ceiling</label>
@@ -257,7 +237,6 @@
             <button class="mode-btn" onclick="setCeilingMode('total')">Total area</button>
           </div>
 
-          <!-- Modo: dimensões -->
           <div id="ceilingModeDimensions">
             <div class="field">
               <label>Room length (<span class="unit-label-c">ft</span>)</label>
@@ -277,7 +256,6 @@
             </div>
           </div>
 
-          <!-- Modo: área total -->
           <div id="ceilingModeTotal" style="display:none;">
             <div class="field">
               <label>Total ceiling area (<span class="unit-label-area">ft²</span>)</label>
@@ -286,13 +264,11 @@
           </div>
         </div>
 
-        <!-- ABERTURAS -->
         <div class="field">
           <label>Openings to deduct (<span class="unit-label-area">ft²</span>) <span style="font-weight:400;color:#94a3b8;">doors, windows, etc.</span></label>
           <input type="number" id="openings" min="0" step="0.1" placeholder="0" value="0" />
         </div>
 
-        <!-- FATOR DE DESPERDÍCIO -->
         <div class="field">
           <label>Waste factor</label>
           <select id="waste">
@@ -303,7 +279,6 @@
           </select>
         </div>
 
-        <!-- TAMANHO DO SHEET -->
         <div class="field">
           <label>Drywall sheet size</label>
           <select id="sheetSize">
@@ -329,7 +304,6 @@
         <button class="btn-calculate" onclick="calculate()">Calculate Drywall Sheets</button>
       </div>
 
-      <!-- PAINEL DE RESULTADO -->
       <div class="panel" id="resultsPanel">
         <h2 class="panel-title">Results</h2>
 
@@ -381,7 +355,6 @@
 
     </div>
 
-    <!-- INFO SECTION -->
     <div class="info-section">
       <h2>How to Use This Calculator</h2>
       <p>Select whether you need drywall for walls, ceiling, or both. Choose how you'd like to enter your measurements — by room perimeter, individual wall dimensions, or a total area you've already calculated.</p>
@@ -396,14 +369,16 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-logo">🏠 Reno<span>Plot</span></div>
-      <p class="footer-text">Free home improvement calculators for the US and UK markets.<br />
-        <a href="../index.html">Back to all calculators</a>
-      </p>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
     </div>
   </footer>
 
   <script>
-    // ── Estado ──────────────────────────────────────────────
     let unit = 'imperial';
     let wallMode = 'perimeter';
     let ceilingMode = 'dimensions';
@@ -411,7 +386,6 @@
     let ceilingEnabled = false;
     let wallCount = 4;
 
-    // ── Unidade ─────────────────────────────────────────────
     function setUnit(u) {
       unit = u;
       document.querySelectorAll('.unit-toggle button').forEach((btn, i) => {
@@ -420,15 +394,13 @@
 
       const isImperial = u === 'imperial';
       const longLabel = isImperial ? 'ft' : 'm';
-      const heightLabel = isImperial ? 'ft' : 'm';
       const areaLabel = isImperial ? 'ft²' : 'm²';
 
       document.querySelectorAll('.unit-label-long').forEach(el => el.textContent = longLabel);
-      document.querySelectorAll('.unit-label-height, .unit-label-height2').forEach(el => el.textContent = heightLabel);
+      document.querySelectorAll('.unit-label-height, .unit-label-height2').forEach(el => el.textContent = longLabel);
       document.querySelectorAll('.unit-label-area').forEach(el => el.textContent = areaLabel);
       document.querySelectorAll('.unit-label-c').forEach(el => el.textContent = longLabel);
 
-      // Mostrar/ocultar campos de polegadas
       const inchRows = [
         'perimeterInchesRow', 'wallHeightPInchesRow', 'wallHeightIInchesRow',
         'ceilingLengthInchesRow', 'ceilingWidthInchesRow'
@@ -438,16 +410,12 @@
         if (el) el.style.display = isImperial ? '' : 'none';
       });
 
-      // Atualizar labels das paredes individuais
       renderWallRows();
-
-      // Atualizar select de sheet size
       updateSheetSizeOptions();
     }
 
     function updateSheetSizeOptions() {
       const sel = document.getElementById('sheetSize');
-      const current = sel.value;
       if (unit === 'imperial') {
         sel.options[0].text = '4×8 ft (32 ft²) – most common';
         sel.options[1].text = '4×12 ft (48 ft²)';
@@ -459,7 +427,6 @@
       }
     }
 
-    // ── Seções habilitadas ───────────────────────────────────
     function toggleSection(section) {
       if (section === 'walls') {
         wallsEnabled = document.getElementById('chkWalls').checked;
@@ -470,7 +437,6 @@
       }
     }
 
-    // ── Modo de parede ───────────────────────────────────────
     function setWallMode(mode) {
       wallMode = mode;
       document.querySelectorAll('#wallsBlock .mode-btn').forEach(btn => btn.classList.remove('active'));
@@ -480,7 +446,6 @@
       document.getElementById('wallModeTotal').style.display = mode === 'total' ? '' : 'none';
     }
 
-    // ── Modo de teto ─────────────────────────────────────────
     function setCeilingMode(mode) {
       ceilingMode = mode;
       document.querySelectorAll('#ceilingBlock .mode-btn').forEach(btn => btn.classList.remove('active'));
@@ -489,7 +454,6 @@
       document.getElementById('ceilingModeTotal').style.display = mode === 'total' ? '' : 'none';
     }
 
-    // ── Paredes individuais ──────────────────────────────────
     function renderWallRows() {
       const container = document.getElementById('wallRows');
       const unitLabel = unit === 'imperial' ? 'ft' : 'm';
@@ -523,12 +487,10 @@
       renderWallRows();
     }
 
-    // ── Sheet size custom ────────────────────────────────────
     document.getElementById('sheetSize').addEventListener('change', function () {
       document.getElementById('customSheetFields').style.display = this.value === 'custom' ? '' : 'none';
     });
 
-    // ── Helpers de conversão ─────────────────────────────────
     function toFt(val, inches) {
       const v = parseFloat(val) || 0;
       const i = parseFloat(inches) || 0;
@@ -546,16 +508,11 @@
       return n.toFixed(decimals);
     }
 
-    function areaLabel() {
-      return unit === 'imperial' ? 'ft²' : 'm²';
-    }
-
     function displayArea(ft2) {
       if (unit === 'imperial') return fmt(ft2) + ' ft²';
       return fmt(ft2 / 10.7639) + ' m²';
     }
 
-    // ── Sheet size em ft² ────────────────────────────────────
     function getSheetFt2() {
       const sel = document.getElementById('sheetSize').value;
       if (sel === 'custom') {
@@ -567,7 +524,6 @@
       return parseFloat(sel);
     }
 
-    // ── Cálculo principal ────────────────────────────────────
     function calculate() {
       let wallAreaFt2 = 0;
       let ceilingAreaFt2 = 0;
@@ -649,7 +605,6 @@
       document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // ── Init ─────────────────────────────────────────────────
     renderWallRows();
     updateSheetSizeOptions();
   </script>
