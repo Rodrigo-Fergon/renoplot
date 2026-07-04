@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <style>
-    /* Market toggle (US / UK) */
     .market-toggle {
       display: flex;
       background: var(--primary-light);
@@ -36,8 +35,6 @@
       background: var(--primary);
       color: var(--white);
     }
-
-    /* Fence type selector */
     .match-selector {
       display: flex;
       flex-direction: column;
@@ -78,8 +75,6 @@
       margin-top: 1px;
       line-height: 1.4;
     }
-
-    /* Tooltip for post spacing field */
     .field-with-tip {
       position: relative;
     }
@@ -128,8 +123,6 @@
       transform: rotate(45deg);
       border-radius: 2px;
     }
-
-    /* Result alert for concrete curing */
     .result-alert {
       display: flex;
       align-items: flex-start;
@@ -153,8 +146,6 @@
     .result-alert-text strong {
       color: #78350f;
     }
-
-    /* Opening note style (reused for assumptions) */
     .opening-note {
       font-size: 0.78rem;
       color: var(--text-secondary);
@@ -164,8 +155,6 @@
       margin-top: 4px;
       line-height: 1.5;
     }
-
-    /* Dynamic breakdown row spacing (built via JS) */
     #dynamic-breakdown .breakdown-item:last-child {
       border-bottom: none;
     }
@@ -201,7 +190,6 @@
       <div class="panel">
         <h2 class="panel-title">Fence Details</h2>
 
-        <!-- Market toggle -->
         <div class="field">
           <label>Measurement Standard</label>
           <div class="market-toggle">
@@ -213,7 +201,6 @@
           </div>
         </div>
 
-        <!-- Fence type -->
         <div class="field" style="margin-top: 16px;">
           <label>Fence Type</label>
           <div class="match-selector" id="type-selector">
@@ -241,26 +228,22 @@
           </div>
         </div>
 
-        <!-- Panel size (only for "panels" type) -->
         <div class="field" id="panel-size-field" style="display:none;">
           <label>Panel Size</label>
           <select id="panel-size"></select>
         </div>
 
-        <!-- Total length -->
         <div class="field" style="margin-top: 4px;">
           <label id="lbl-length">Total Fence Length (ft)</label>
           <input type="number" id="fence-length" placeholder="e.g. 150" min="0" step="0.1" />
           <div class="opening-note">Measure the full perimeter of your fence run, including any gate openings.</div>
         </div>
 
-        <!-- Height -->
         <div class="field">
           <label id="lbl-height">Fence Height (ft)</label>
           <input type="number" id="fence-height" placeholder="e.g. 6" min="0" step="0.1" />
         </div>
 
-        <!-- Post spacing (hidden for panels, since panel width defines spacing) -->
         <div class="field field-with-tip" id="spacing-field">
           <label>
             <span id="lbl-spacing">Post Spacing (ft)</span>
@@ -272,7 +255,6 @@
           <input type="number" id="post-spacing" step="0.1" />
         </div>
 
-        <!-- Gates -->
         <div class="field-row" style="margin-top: 12px;">
           <div class="field">
             <label>Number of Gates</label>
@@ -304,9 +286,7 @@
             <div class="result-unit">posts</div>
           </div>
 
-          <div class="result-breakdown" id="dynamic-breakdown">
-            <!-- Rows inserted by JS -->
-          </div>
+          <div class="result-breakdown" id="dynamic-breakdown"></div>
 
           <div class="result-note" id="res-note"></div>
 
@@ -349,23 +329,24 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-logo">🏠 RenoPlot</div>
-      <p class="footer-text">Free home improvement calculators for US and UK projects.</p>
+      <p class="footer-text">© 2025 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
     </div>
   </footer>
 
   <script>
-    // ─── State ───────────────────────────────────────────────────────────────
-    let market = 'us'; // 'us' or 'uk'
-    let fenceType = 'wood'; // 'wood' | 'panels' | 'chainlink'
+    let market = 'us';
+    let fenceType = 'wood';
 
-    // Default post spacing by type & market
     const SPACING_DEFAULTS = {
       wood:      { us: 8,   uk: 2.4 },
       chainlink: { us: 10,  uk: 3 }
-      // panels: spacing = panel size, handled separately
     };
 
-    // Panel size options by market
     const PANEL_SIZES = {
       us: [ { value: 6, label: '6 ft panels' }, { value: 8, label: '8 ft panels' } ],
       uk: [ { value: 1.8, label: '1.8 m panels' }, { value: 2.4, label: '2.4 m panels' } ]
@@ -374,7 +355,6 @@
     const CONCRETE_BAGS_PER_POST = 2;
     const CONCRETE_UNIT_LABEL = { us: '50 lb bags', uk: '25 kg bags' };
 
-    // ─── Market toggle ────────────────────────────────────────────────────────
     function setMarket(m) {
       market = m;
       document.getElementById('btn-us').classList.toggle('active', m === 'us');
@@ -411,7 +391,6 @@
       sel.onchange = applySpacingDefault;
     }
 
-    // ─── Fence type selection ─────────────────────────────────────────────────
     function updateTypeSelection() {
       const options = document.querySelectorAll('#type-selector .match-option');
       options.forEach(opt => {
@@ -437,13 +416,11 @@
       document.getElementById('post-spacing').value = spacing;
     }
 
-    // ─── Gate width toggle ────────────────────────────────────────────────────
     function toggleGateWidth() {
       const gates = parseInt(document.getElementById('num-gates').value) || 0;
       document.getElementById('gate-width-field').style.display = gates > 0 ? 'block' : 'none';
     }
 
-    // ─── Tooltip ──────────────────────────────────────────────────────────────
     function toggleTip() {
       document.getElementById('tip-box').classList.toggle('visible');
     }
@@ -452,13 +429,12 @@
       if (!e.target.closest('.field-with-tip')) tip.classList.remove('visible');
     });
 
-    // ─── Main calculation ─────────────────────────────────────────────────────
     function calculate() {
       const totalLength = parseFloat(document.getElementById('fence-length').value);
       const height       = parseFloat(document.getElementById('fence-height').value);
-      const spacing       = parseFloat(document.getElementById('post-spacing').value);
-      const numGates       = parseInt(document.getElementById('num-gates').value) || 0;
-      const gateWidth     = numGates > 0 ? (parseFloat(document.getElementById('gate-width').value) || 0) : 0;
+      const spacing      = parseFloat(document.getElementById('post-spacing').value);
+      const numGates     = parseInt(document.getElementById('num-gates').value) || 0;
+      const gateWidth    = numGates > 0 ? (parseFloat(document.getElementById('gate-width').value) || 0) : 0;
 
       if (!totalLength || totalLength <= 0 || !height || height <= 0 || !spacing || spacing <= 0) {
         alert('Please enter valid fence length, height, and post spacing before calculating.');
@@ -466,20 +442,13 @@
       }
 
       const materialLength = Math.max(totalLength - (numGates * gateWidth), 0);
-
-      // Posts
       const sections   = Math.ceil(totalLength / spacing);
       const basePosts  = sections + 1;
-      const gateExtra  = numGates; // one dedicated gate post per gate
+      const gateExtra  = numGates;
       const totalPosts = basePosts + gateExtra;
-
-      // Concrete
       const concreteBags = totalPosts * CONCRETE_BAGS_PER_POST;
-
-      // Unit label
       const unit = market === 'us' ? 'ft' : 'm';
 
-      // Breakdown rows (common)
       const rows = [
         { label: 'Total fence length', value: `${totalLength.toFixed(1)} ${unit}` },
         { label: 'Material needed (excl. gates)', value: `${materialLength.toFixed(1)} ${unit}` },
@@ -489,14 +458,12 @@
 
       let note = '';
 
-      // Type-specific
       if (fenceType === 'wood') {
         const railsPerSection = height <= (market === 'us' ? 4 : 1.2) ? 2
                                : height <= (market === 'us' ? 8 : 2.4) ? 3
                                : 4;
         const totalRails = sections * railsPerSection;
-
-        const picketWidth = market === 'us' ? 5.5 : 14;   // in or cm
+        const picketWidth = market === 'us' ? 5.5 : 14;
         const picketUnit  = market === 'us' ? 'in' : 'cm';
         const lengthInPicketUnit = market === 'us' ? materialLength * 12 : materialLength * 100;
         const pickets = Math.ceil(lengthInPicketUnit / picketWidth);
@@ -520,7 +487,7 @@
         note = 'Panel count assumes full-size panels only. If your fence length is not an exact multiple of the panel size, the last panel will need to be trimmed on site.';
 
       } else if (fenceType === 'chainlink') {
-        const meshLength = materialLength * 1.05; // 5% overlap/waste
+        const meshLength = materialLength * 1.05;
 
         rows.push({ label: 'Mesh fabric needed (incl. 5% overlap)', value: `${meshLength.toFixed(1)} ${unit}` });
         rows.push({ label: 'Top rail length', value: `${materialLength.toFixed(1)} ${unit}` });
@@ -529,7 +496,6 @@
         note = 'Posts shown combine terminal and line posts. Corner and gate posts are typically heavier gauge than standard line posts — check this with your supplier.';
       }
 
-      // ─── Render ───────────────────────────────────────────────────────────
       document.getElementById('results-placeholder').style.display = 'none';
       document.getElementById('results-output').style.display = 'block';
 
@@ -557,7 +523,6 @@
       }, 40);
     }
 
-    // ─── Init ───────────────────────────────────────────────────────────────
     refreshUnitLabels();
     populatePanelSizes();
     applySpacingDefault();
