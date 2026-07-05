@@ -68,9 +68,23 @@
       background: var(--primary-light);
       border-radius: var(--radius-sm);
       padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .cross-link-box a:last-child {
+      margin-bottom: 0;
     }
     .cross-link-box a:hover {
       text-decoration: underline;
+    }
+    .disclaimer {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      color: #1e40af;
+      line-height: 1.55;
     }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
@@ -202,3 +216,137 @@
               <span class="breakdown-value" id="res-landing-vol">—</span>
             </div>
             <div class="breakdown-item">
+              <span class="breakdown-label">Total volume (with 10% waste)</span>
+              <span class="breakdown-value" id="res-total-vol">—</span>
+            </div>
+          </div>
+
+          <div class="cross-link-box">
+            <a href="concrete-calculator.html">Need concrete for a bigger project too? Try our Concrete Calculator →</a>
+            <a href="fence-calculator.html">Also setting fence posts? Try our Fence Calculator →</a>
+          </div>
+
+          <div class="disclaimer">
+            ⚠️ Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <section class="info-section">
+      <h2>How to Calculate Concrete for Outdoor Steps</h2>
+      <p>Steps are stacked slabs of decreasing size, so a straight length × width × depth formula does not work. Each step sits on top of the one below it, which means the concrete volume grows with the square of the step count rather than a simple multiple. This calculator sums the volume of every individual step, from the bottom to the top, to get an exact total instead of a rough approximation.</p>
+
+      <h3>What the Stacking Formula Accounts For</h3>
+      <p>For a staircase with <em>n</em> steps, the total volume equals the width times the run times the rise, multiplied by n × (n + 1) ÷ 2. This factor comes from adding step 1, plus step 1 and 2, plus step 1, 2 and 3, and so on, all the way to the top. It is the same logic used in the Steps mode of our main <a href="concrete-calculator.html">Concrete Calculator</a>, kept consistent here so both tools always agree.</p>
+
+      <h3>Do You Need a Landing?</h3>
+      <p>A landing is the flat platform at the top of a staircase, common on porches, decks, and taller retaining walls. This calculator assumes the landing has the same thickness as your top step's rise, so it forms a level, continuous surface with the last step. If your staircase does not end at a landing, leave that checkbox unmarked and the calculator will estimate steps only.</p>
+
+      <h3>Bag Sizes Explained</h3>
+      <p>In the US, this calculator converts your total volume into standard 50 lb bags, each yielding approximately 0.375 cubic feet of concrete. In the UK, it converts into 25 kg bags, each yielding approximately 0.0130 cubic meters, matching the values published by major manufacturers such as Wickes and Blue Circle. A 10% waste factor is added automatically to cover spillage, uneven ground, and overpour.</p>
+
+      <h3>Building More Than Just Steps?</h3>
+      <p>If your project also includes a slab, footing, or column, our main <a href="concrete-calculator.html">Concrete Calculator</a> covers all four shapes in one tool. Adding a fence along the same staircase or walkway? Check out our <a href="fence-calculator.html">Fence Calculator</a> for post and concrete footing estimates.</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2025 RenoPlot. All estimates are for reference only. Always consult a professional before purchasing materials.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let currentUnit = 'us';
+
+    function setUnit(unit) {
+      currentUnit = unit;
+      const isUS = unit === 'us';
+      document.getElementById('btn-us').classList.toggle('active', isUS);
+      document.getElementById('btn-uk').classList.toggle('active', !isUS);
+
+      document.getElementById('label-width').textContent   = isUS ? 'Staircase Width (ft)'  : 'Staircase Width (m)';
+      document.getElementById('label-rise').textContent    = isUS ? 'Rise per Step (in)'     : 'Rise per Step (cm)';
+      document.getElementById('label-run').textContent     = isUS ? 'Run per Step (in)'      : 'Run per Step (cm)';
+      document.getElementById('label-landing').textContent = isUS ? 'Landing Depth (ft)'     : 'Landing Depth (m)';
+
+      document.getElementById('unit-note').textContent = isUS
+        ? 'US units selected: feet for width, inches for rise/run, 50 lb bags for concrete.'
+        : 'UK units selected: meters for width, centimeters for rise/run, 25 kg bags for concrete.';
+
+      document.getElementById('res-bags-unit').textContent = isUS ? '50 lb bags' : '25 kg bags';
+
+      resetResults();
+    }
+
+    function toggleLanding() {
+      const checked = document.getElementById('has-landing').checked;
+      document.getElementById('landing-field').style.display = checked ? 'block' : 'none';
+    }
+
+    function resetResults() {
+      document.getElementById('result-placeholder').style.display = 'flex';
+      document.getElementById('result-output').style.display = 'none';
+    }
+
+    function calculate() {
+      const isUS = currentUnit === 'us';
+      const hasLanding = document.getElementById('has-landing').checked;
+
+      const W     = parseFloat(document.getElementById('stair-width').value);
+      const rise  = parseFloat(document.getElementById('step-rise').value);
+      const run   = parseFloat(document.getElementById('step-run').value);
+      const count = parseFloat(document.getElementById('step-count').value);
+
+      if (!W || !rise || !run || !count) {
+        return alert('Please fill in all step dimensions.');
+      }
+
+      let landingDepth = 0;
+      if (hasLanding) {
+        landingDepth = parseFloat(document.getElementById('landing-depth').value);
+        if (!landingDepth) {
+          return alert('Please fill in the landing depth, or uncheck "Add a top landing".');
+        }
+      }
+
+      let stepsVol, landingVol, unitLabel, bagYield;
+
+      if (isUS) {
+        // width in ft, rise/run in inches -> convert to ft
+        stepsVol   = W * (run / 12) * (rise / 12) * count * (count + 1) / 2;
+        landingVol = hasLanding ? W * landingDepth * (rise / 12) : 0;
+        unitLabel  = 'ft³';
+        bagYield   = 0.375; // 50 lb bag
+      } else {
+        // width in m, rise/run in cm -> convert to m
+        stepsVol   = W * (run / 100) * (rise / 100) * count * (count + 1) / 2;
+        landingVol = hasLanding ? W * landingDepth * (rise / 100) : 0;
+        unitLabel  = 'm³';
+        bagYield   = 0.0130; // 25 kg bag
+      }
+
+      const totalVol = (stepsVol + landingVol) * 1.10; // 10% waste factor
+      const bags = Math.ceil(totalVol / bagYield);
+
+      document.getElementById('res-bags').textContent        = bags;
+      document.getElementById('res-steps-vol').textContent   = stepsVol.toFixed(2) + ' ' + unitLabel;
+      document.getElementById('res-landing-vol').textContent = hasLanding ? (landingVol.toFixed(2) + ' ' + unitLabel) : '—';
+      document.getElementById('res-total-vol').textContent   = totalVol.toFixed(2) + ' ' + unitLabel;
+
+      document.getElementById('result-placeholder').style.display = 'none';
+      document.getElementById('result-output').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
