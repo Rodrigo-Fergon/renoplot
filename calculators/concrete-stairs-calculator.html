@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concrete Stairs Calculator – How Many Bags for Steps & Landing? | RenoPlot</title>
+  <meta name="description" content="Calculate exactly how many concrete bags you need for outdoor steps, including an optional top landing. Supports US and UK units. Free and instant.">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .toggle-btn {
+      padding: 10px;
+      border: none;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .landing-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    .landing-row input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .landing-row label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .opening-note {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .cross-link-box {
+      margin-top: 16px;
+    }
+    .cross-link-box a {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: none;
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .cross-link-box a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Concrete Stairs Calculator",
+    "url": "https://renoplot.com/calculators/concrete-stairs-calculator.html",
+    "description": "Calculate exactly how many concrete bags you need for outdoor steps, including an optional top landing. Supports US and UK units. Free and instant.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (Web-based)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">RenoPlot</span>
+      </a>
+      <span class="header-tagline">Free Home Improvement Calculators</span>
+    </div>
+  </header>
+
+  <main class="calc-page">
+
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      <span>Concrete Stairs Calculator</span>
+    </nav>
+
+    <div class="calc-page-header">
+      <h1 class="calc-page-title">Concrete Stairs Calculator</h1>
+      <p class="calc-page-desc">Enter your step dimensions to estimate exactly how many concrete bags you need for a set of outdoor steps, with an optional top landing.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Staircase Details</div>
+
+        <div class="field">
+          <label>Measurement Standard</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="btn-us" onclick="setUnit('us')">🇺🇸 US</button>
+            <button class="toggle-btn" id="btn-uk" onclick="setUnit('uk')">🇬🇧 UK</button>
+          </div>
+          <div class="opening-note" id="unit-note">
+            US units selected: feet for width, inches for rise/run, 50 lb bags for concrete.
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="label-width">Staircase Width (ft)</label>
+          <input type="number" id="stair-width" placeholder="e.g. 4" min="0" step="0.1">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label id="label-rise">Rise per Step (in)</label>
+            <input type="number" id="step-rise" placeholder="e.g. 7" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label id="label-run">Run per Step (in)</label>
+            <input type="number" id="step-run" placeholder="e.g. 11" min="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Number of Steps</label>
+          <input type="number" id="step-count" placeholder="e.g. 4" min="0" step="1">
+        </div>
+
+        <div class="field">
+          <div class="landing-row">
+            <input type="checkbox" id="has-landing" onchange="toggleLanding()">
+            <label for="has-landing">Add a top landing</label>
+          </div>
+          <div id="landing-field" style="display:none;">
+            <label id="label-landing">Landing Depth (ft)</label>
+            <input type="number" id="landing-depth" placeholder="e.g. 4" min="0" step="0.1">
+            <div class="opening-note">Landing thickness is assumed equal to your top step rise, so it forms a level continuation of the staircase.</div>
+          </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate</button>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Your Estimate</div>
+
+        <div id="result-placeholder" class="results-placeholder">
+          <span class="results-placeholder-icon">🪜</span>
+          <p>Fill in your step dimensions and click Calculate to see your concrete bag estimate.</p>
+        </div>
+
+        <div id="result-output" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">Concrete Bags Needed</div>
+            <div class="result-number" id="res-bags">—</div>
+            <div class="result-unit" id="res-bags-unit">50 lb bags</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Steps volume</span>
+              <span class="breakdown-value" id="res-steps-vol">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Landing volume</span>
+              <span class="breakdown-value" id="res-landing-vol">—</span>
+            </div>
+            <div class="breakdown-item">
