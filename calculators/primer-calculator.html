@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Primer Calculator — RenoPlot</title>
+  <meta name="description" content="Calculate exactly how much primer you need based on surface type and primer type. Free primer calculator for drywall, wood, masonry, and stained surfaces.">
+  <link rel="stylesheet" href="../style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Primer Calculator",
+    "url": "https://renoplot.com/calculators/primer-calculator.html",
+    "description": "Calculate exactly how much primer you need based on surface type and primer type. Free primer calculator for drywall, wood, masonry, and stained surfaces.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (Web-based)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
+    </div>
+  </header>
+
+  <!-- PAGE -->
+  <main class="calc-page">
+
+    <div class="calc-page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a>
+        <span>›</span>
+        <span>Primer Calculator</span>
+      </div>
+      <h1 class="calc-page-title">Primer Calculator</h1>
+      <p class="calc-page-desc">Enter your surface details and primer type to get an accurate estimate — coverage varies more than most people expect between drywall, wood, and masonry.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Surface & Primer Details</div>
+
+        <div class="field">
+          <label for="unit-system">Measurement System</label>
+          <select id="unit-system" onchange="updateUnitLabels()">
+            <option value="us" selected>US — Gallons / sq ft</option>
+            <option value="uk">UK — Liters / m²</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="surface-area" id="area-label">Surface Area (sq ft)</label>
+          <input type="number" id="surface-area" placeholder="e.g. 430" min="1">
+        </div>
+
+        <div class="field">
+          <label for="surface-type">Surface Type</label>
+          <select id="surface-type">
+            <option value="drywall" selected>New Drywall</option>
+            <option value="wood">Bare Wood</option>
+            <option value="painted">Previously Painted (Good Condition)</option>
+            <option value="stained">Stained / Water-Damaged</option>
+            <option value="masonry">Masonry / Concrete / Brick</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="primer-type">Primer Type</label>
+          <select id="primer-type">
+            <option value="water" selected>Water-Based (Latex)</option>
+            <option value="oil">Oil-Based</option>
+            <option value="shellac">Shellac-Based (Stain-Blocking)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="num-coats">Number of Coats</label>
+          <select id="num-coats">
+            <option value="1" selected>1 coat (most situations)</option>
+            <option value="2">2 coats (severe stains or bare wood)</option>
+          </select>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Primer Needed</button>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="panel" id="results-panel">
+        <div class="panel-title">Your Estimate</div>
+
+        <div class="results-placeholder" id="placeholder">
+          <div class="results-placeholder-icon">🪣</div>
+          <p>Fill in your surface details and click Calculate to see your primer estimate.</p>
+        </div>
+
+        <div id="results" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">Primer Needed</div>
+            <div class="result-number" id="result-gallons">0</div>
+            <div class="result-unit" id="result-unit-label">gallons</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Surface area</span>
+              <span class="breakdown-value" id="bd-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coverage rate</span>
+              <span class="breakdown-value" id="bd-coverage">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coats</span>
+              <span class="breakdown-value" id="bd-coats">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Total area to cover</span>
+              <span class="breakdown-value" id="bd-total">—</span>
+            </div>
+          </div>
+
+          <div class="result-note" id="result-note"></div>
+
+          <div class="result-note" style="margin-top:10px; background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            Always verify quantities with your paint supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+      <h2>How to Calculate How Much Primer You Need</h2>
+      <p>Primer coverage is not one-size-fits-all. Unlike topcoat paint, the amount you need depends heavily on what surface you're priming and which type of primer you're using — get either wrong and you'll either run short mid-job or overpay for primer you didn't need.</p>
+
+      <h3>The Basic Formula</h3>
+      <p>Measure the total surface area to be primed, multiply by the number of coats, then divide by the coverage rate for your specific surface and primer combination. Porous or absorbent surfaces pull coverage rates down significantly compared to a smooth, previously painted wall.</p>
+
+      <h3>Why Surface Type Matters</h3>
+      <p>New drywall and previously painted walls in good condition are the most forgiving surfaces — they accept primer evenly and need less of it. Bare wood, masonry, and stained or water-damaged surfaces are more absorbent or require a stronger sealing product, which lowers effective coverage per gallon.</p>
+
+      <h3>Choosing the Right Primer Type</h3>
+      <p>Water-based (latex) primer works well for most drywall and previously painted surfaces and cleans up easily. Oil-based primer offers better tannin- and stain-blocking on bare wood. Shellac-based primer is the strongest option for permanently sealing water stains, smoke damage, or dark color changes, though it comes with strong fumes and requires solvent cleanup.</p>
+
+      <h3>One Coat or Two?</h3>
+      <p>One coat is enough for most new drywall or previously painted surfaces. Bare wood, severe stains, or a dramatic color change from dark to light usually call for two coats to get full, even sealing before you apply your topcoat.</p>
+
+      <h3>Priming Before You Paint</h3>
+      <p>Once you know how much primer you need, use our <a href="paint-calculator.html">Paint Calculator</a> to estimate the topcoat as well — priming and painting together is the most reliable way to plan a full room or exterior project without a second trip to the store.</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2026 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SQFT_PER_M2 = 10.7639;
+    const LITERS_PER_GALLON = 3.78541;
+
+    // Coverage rates in sq ft per gallon, by surface type and primer type
+    const coverageTable = {
+      drywall:  { water: 300, oil: 280, shellac: 250 },
+      wood:     { water: 250, oil: 300, shellac: 220 },
+      painted:  { water: 350, oil: 320, shellac: 280 },
+      stained:  { water: 220, oil: 250, shellac: 200 },
+      masonry:  { water: 200, oil: 220, shellac: 180 }
+    };
+
+    function updateUnitLabels() {
+      const unit = document.getElementById('unit-system').value;
+      const label = document.getElementById('area-label');
+      const input = document.getElementById('surface-area');
+      if (unit === 'uk') {
+        label.textContent = 'Surface Area (m²)';
+        input.placeholder = 'e.g. 40';
+      } else {
+        label.textContent = 'Surface Area (sq ft)';
+        input.placeholder = 'e.g. 430';
+      }
+    }
+
+    function getRecommendation(surface, primerType) {
+      if (surface === 'stained' && primerType === 'water') {
+        return "Water-based primers often fail to fully block tough stains. For water damage, smoke, or marker stains, a shellac-based or oil-based primer gives a more permanent seal.";
+      }
+      if (surface === 'wood' && primerType === 'water') {
+        return "On bare wood, water-based primer can allow tannins to bleed through over time. An oil-based primer is generally a safer choice for raw wood trim and cabinets.";
+      }
+      if (surface === 'painted' && primerType === 'shellac') {
+        return "Shellac-based primer is usually more than you need for a previously painted surface in good condition. A water-based primer will save money with similar results.";
+      }
+      if (surface === 'masonry' && primerType === 'shellac') {
+        return "Masonry and concrete typically call for a dedicated acrylic masonry primer rather than shellac. A water-based option is usually the better fit here.";
+      }
+      return "This estimate includes a small buffer. Always confirm coverage with the specific product label — porous or heavily textured surfaces can use noticeably more primer.";
+    }
+
+    function calculate() {
+      const unit = document.getElementById('unit-system').value;
+      const areaInput = parseFloat(document.getElementById('surface-area').value);
+      const surface = document.getElementById('surface-type').value;
+      const primerType = document.getElementById('primer-type').value;
+      const coats = parseInt(document.getElementById('num-coats').value);
+
+      if (!areaInput || areaInput <= 0) {
+        alert('Please enter a valid surface area.');
+        return;
+      }
+
+      const areaSqFt = unit === 'uk' ? areaInput * SQFT_PER_M2 : areaInput;
+      const coverageSqFtPerGallon = coverageTable[surface][primerType];
+      const totalAreaSqFt = areaSqFt * coats;
+      const gallonsExact = totalAreaSqFt / coverageSqFtPerGallon;
+
+      let resultValue, resultUnitLabel, coverageDisplay, areaDisplay, totalDisplay;
+
+      if (unit === 'uk') {
+        const litersExact = gallonsExact * LITERS_PER_GALLON;
+        const litersRounded = Math.ceil(litersExact * 2) / 2; // round up to nearest 0.5 L
+        resultValue = litersRounded;
+        resultUnitLabel = litersRounded === 1 ? 'liter' : 'liters';
+        const coverageM2PerLiter = (coverageSqFtPerGallon / SQFT_PER_M2) / LITERS_PER_GALLON;
+        coverageDisplay = coverageM2PerLiter.toFixed(1) + ' m²/liter';
+        areaDisplay = areaInput.toFixed(1) + ' m²';
+        totalDisplay = (totalAreaSqFt / SQFT_PER_M2).toFixed(1) + ' m²';
+      } else {
+        const gallonsRounded = Math.ceil(gallonsExact);
+        resultValue = gallonsRounded;
+        resultUnitLabel = gallonsRounded === 1 ? 'gallon' : 'gallons';
+        coverageDisplay = coverageSqFtPerGallon + ' sq ft/gal';
+        areaDisplay = areaInput.toFixed(0) + ' sq ft';
+        totalDisplay = totalAreaSqFt.toFixed(0) + ' sq ft';
+      }
+
+      document.getElementById('result-gallons').textContent = resultValue;
+      document.getElementById('result-unit-label').textContent = resultUnitLabel;
+      document.getElementById('bd-area').textContent = areaDisplay;
+      document.getElementById('bd-coverage').textContent = coverageDisplay;
+      document.getElementById('bd-coats').textContent = coats + (coats === 1 ? ' coat' : ' coats');
+      document.getElementById('bd-total').textContent = totalDisplay;
+      document.getElementById('result-note').textContent = getRecommendation(surface, primerType);
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
