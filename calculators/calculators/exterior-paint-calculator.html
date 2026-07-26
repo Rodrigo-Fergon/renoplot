@@ -1,1 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exterior Paint Calculator — RenoPlot</title>
+  <meta name="description" content="Calculate exactly how much exterior paint you need based on your siding material. Free exterior paint calculator for vinyl, wood, stucco, fiber cement, and masonry.">
+  <link rel="stylesheet" href="../style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Exterior Paint Calculator",
+    "url": "https://renoplot.com/calculators/exterior-paint-calculator.html",
+    "description": "Calculate exactly how much exterior paint you need based on your siding material. Free exterior paint calculator for vinyl, wood, stucco, fiber cement, and masonry.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (Web-based)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body>
 
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏠</div>
+        <div class="logo-text">Reno<span>Plot</span></div>
+      </a>
+      <p class="header-tagline">Free Home Improvement Calculators</p>
+    </div>
+  </header>
+
+  <!-- PAGE -->
+  <main class="calc-page">
+
+    <div class="calc-page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a>
+        <span>›</span>
+        <span>Exterior Paint Calculator</span>
+      </div>
+      <h1 class="calc-page-title">Exterior Paint Calculator</h1>
+      <p class="calc-page-desc">Pick your siding material and we'll adjust coverage automatically — vinyl, stucco, and brick don't drink up paint the same way, and getting this wrong means an extra trip to the store mid-job.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Siding & Surface Details</div>
+
+        <div class="field">
+          <label for="unit-system">Measurement System</label>
+          <select id="unit-system" onchange="updateUnitLabels()">
+            <option value="us" selected>US — Gallons / sq ft</option>
+            <option value="uk">UK — Liters / m²</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="surface-area" id="area-label">Exterior Area to Paint (sq ft)</label>
+          <input type="number" id="surface-area" placeholder="e.g. 1600" min="1">
+        </div>
+
+        <div class="field">
+          <label for="siding-material">Siding Material</label>
+          <select id="siding-material" onchange="checkCondition()">
+            <option value="vinyl" selected>Vinyl Siding</option>
+            <option value="wood">Wood Siding / Clapboard</option>
+            <option value="stucco">Stucco</option>
+            <option value="fibercement">Fiber Cement (e.g. HardiePlank)</option>
+            <option value="masonry">Masonry / Brick</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="surface-condition">Surface Condition</label>
+          <select id="surface-condition" onchange="checkCondition()">
+            <option value="painted" selected>Previously Painted (Good Condition)</option>
+            <option value="raw">Bare / Never Painted</option>
+            <option value="porous">Porous / Chalky / Weathered</option>
+            <option value="damaged">Damaged / Peeling / Water Stains</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="num-coats">Number of Coats</label>
+          <select id="num-coats">
+            <option value="1">1 coat (touch-up or same color)</option>
+            <option value="2" selected>2 coats (most exterior jobs)</option>
+          </select>
+        </div>
+
+        <div class="primer-recommendation" id="primer-flag" style="display:none;">
+          🛢️ This surface condition usually needs priming first. Check our <a href="primer-calculator.html">Primer Calculator</a> before you buy topcoat paint.
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Paint Needed</button>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="panel" id="results-panel">
+        <div class="panel-title">Your Estimate</div>
+
+        <div class="results-placeholder" id="placeholder">
+          <div class="results-placeholder-icon">🎨</div>
+          <p>Fill in your siding details and click Calculate to see your exterior paint estimate.</p>
+        </div>
+
+        <div id="results" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">Paint Needed</div>
+            <div class="result-number" id="result-gallons">0</div>
+            <div class="result-unit" id="result-unit-label">gallons</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Exterior area</span>
+              <span class="breakdown-value" id="bd-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coverage rate</span>
+              <span class="breakdown-value" id="bd-coverage">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coats</span>
+              <span class="breakdown-value" id="bd-coats">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Total area to cover</span>
+              <span class="breakdown-value" id="bd-total">—</span>
+            </div>
+          </div>
+
+          <div class="result-note" id="result-note"></div>
+
+          <div class="result-note" style="margin-top:10px; background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+      <h2>How to Calculate How Much Exterior Paint You Need</h2>
+      <p>Exterior paint coverage depends far more on siding material than most DIYers expect. A gallon that covers 400 sq ft of smooth vinyl might only stretch across 250 sq ft of stucco — the texture and porosity of the surface change how much paint actually gets absorbed versus sitting on top where it belongs.</p>
+
+      <h3>The Basic Formula</h3>
+      <p>Measure your total exterior wall area, multiply by the number of coats, then divide by the coverage rate for your specific siding material. Rough or porous materials pull coverage down; smooth, sealed materials stretch a gallon further.</p>
+
+      <h3>Why Siding Material Matters</h3>
+      <p>Vinyl and fiber cement siding are relatively smooth and factory-primed, so they accept paint evenly and need less of it. Wood siding sits in the middle. Stucco and masonry are the most porous and textured surfaces on this list, and they can use noticeably more paint per square foot than a smooth wall — sometimes 30 to 40% more.</p>
+
+      <h3>When You Need to Prime First</h3>
+      <p>Bare siding, chalky or weathered surfaces, and anything peeling, damaged, or water-stained should be primed before topcoat paint goes on. Skipping primer on these surfaces usually means poor adhesion, uneven color, and a repaint sooner than you'd like. Use our <a href="primer-calculator.html">Primer Calculator</a> to estimate that step separately — it accounts for surface type and primer type on its own.</p>
+
+      <h3>One Coat or Two?</h3>
+      <p>Two coats is the standard recommendation for most exterior repaints, especially with a color change or after several years of weathering. One coat can be enough for a same-color touch-up on a surface that's already in good condition.</p>
+
+      <h3>Planning the Full Exterior Job</h3>
+      <p>If part of your project also includes trim, fences, or interior walls, check our <a href="paint-calculator.html">Paint Calculator</a> and <a href="fence-calculator.html">Fence Calculator</a> to estimate those separately — exterior siding, trim, and fencing each have different coverage needs.</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2026 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SQFT_PER_M2 = 10.7639;
+    const LITERS_PER_GALLON = 3.78541;
+
+    // Coverage rates in sq ft per gallon, by siding material
+    const coverageTable = {
+      vinyl:       400,
+      wood:        350,
+      stucco:      250,
+      fibercement: 380,
+      masonry:     220
+    };
+
+    const conditionsNeedingPrimer = ['raw', 'porous', 'damaged'];
+
+    function updateUnitLabels() {
+      const unit = document.getElementById('unit-system').value;
+      const label = document.getElementById('area-label');
+      const input = document.getElementById('surface-area');
+      if (unit === 'uk') {
+        label.textContent = 'Exterior Area to Paint (m²)';
+        input.placeholder = 'e.g. 150';
+      } else {
+        label.textContent = 'Exterior Area to Paint (sq ft)';
+        input.placeholder = 'e.g. 1600';
+      }
+    }
+
+    function checkCondition() {
+      const condition = document.getElementById('surface-condition').value;
+      const flag = document.getElementById('primer-flag');
+      flag.style.display = conditionsNeedingPrimer.includes(condition) ? 'block' : 'none';
+    }
+
+    function getRecommendation(material, condition) {
+      if (conditionsNeedingPrimer.includes(condition)) {
+        return "This surface condition needs priming before topcoat paint for proper adhesion — this estimate covers the paint only, not the primer coat.";
+      }
+      if (material === 'stucco' || material === 'masonry') {
+        return "Textured and porous surfaces like this one can use more paint than the estimate if the texture is especially heavy. Buy slightly over rather than under.";
+      }
+      return "This estimate includes a small buffer. Always confirm coverage with the specific product label — heavier textures can use noticeably more paint.";
+    }
+
+    function calculate() {
+      const unit = document.getElementById('unit-system').value;
+      const areaInput = parseFloat(document.getElementById('surface-area').value);
+      const material = document.getElementById('siding-material').value;
+      const condition = document.getElementById('surface-condition').value;
+      const coats = parseInt(document.getElementById('num-coats').value);
+
+      if (!areaInput || areaInput <= 0) {
+        alert('Please enter a valid exterior area.');
+        return;
+      }
+
+      const areaSqFt = unit === 'uk' ? areaInput * SQFT_PER_M2 : areaInput;
+      const coverageSqFtPerGallon = coverageTable[material];
+      const totalAreaSqFt = areaSqFt * coats;
+      const gallonsExact = totalAreaSqFt / coverageSqFtPerGallon;
+
+      let resultValue, resultUnitLabel, coverageDisplay, areaDisplay, totalDisplay;
+
+      if (unit === 'uk') {
+        const litersExact = gallonsExact * LITERS_PER_GALLON;
+        const litersRounded = Math.ceil(litersExact * 2) / 2; // round up to nearest 0.5 L
+        resultValue = litersRounded;
+        resultUnitLabel = litersRounded === 1 ? 'liter' : 'liters';
+        const coverageM2PerLiter = (coverageSqFtPerGallon / SQFT_PER_M2) / LITERS_PER_GALLON;
+        coverageDisplay = coverageM2PerLiter.toFixed(1) + ' m²/liter';
+        areaDisplay = areaInput.toFixed(1) + ' m²';
+        totalDisplay = (totalAreaSqFt / SQFT_PER_M2).toFixed(1) + ' m²';
+      } else {
+        const gallonsRounded = Math.ceil(gallonsExact);
+        resultValue = gallonsRounded;
+        resultUnitLabel = gallonsRounded === 1 ? 'gallon' : 'gallons';
+        coverageDisplay = coverageSqFtPerGallon + ' sq ft/gal';
+        areaDisplay = areaInput.toFixed(0) + ' sq ft';
+        totalDisplay = totalAreaSqFt.toFixed(0) + ' sq ft';
+      }
+
+      document.getElementById('result-gallons').textContent = resultValue;
+      document.getElementById('result-unit-label').textContent = resultUnitLabel;
+      document.getElementById('bd-area').textContent = areaDisplay;
+      document.getElementById('bd-coverage').textContent = coverageDisplay;
+      document.getElementById('bd-coats').textContent = coats + (coats === 1 ? ' coat' : ' coats');
+      document.getElementById('bd-total').textContent = totalDisplay;
+      document.getElementById('result-note').textContent = getRecommendation(material, condition);
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
