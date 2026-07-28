@@ -134,7 +134,7 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="../index.html" class="logo">
-        <span class="logo-icon">🏠</span>
+        <img src="../logo-icon.svg" alt="RenoPlot" class="logo-icon">
         <span class="logo-text">RenoPlot</span>
       </a>
       <span class="header-tagline">Free Home Improvement Calculators</span>
@@ -358,7 +358,7 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-logo">Reno<span>Plot</span></div>
-      <p class="footer-text">© 2025 RenoPlot. All estimates are for reference only. Always consult a professional before purchasing materials.</p>
+      <p class="footer-text">© 2026 RenoPlot. All estimates are for reference only. Always consult a professional before purchasing materials.</p>
       <div class="footer-links">
         <a href="../about.html">About</a>
         <a href="../privacy-policy.html">Privacy Policy</a>
@@ -417,59 +417,4 @@
       if (currentShape === 'slab') {
         const L = parseFloat(document.getElementById('slab-length').value);
         const W = parseFloat(document.getElementById('slab-width').value);
-        const T = parseFloat(document.getElementById('slab-thickness').value);
-        if (!L || !W || !T) return alert('Please fill in all dimensions.');
-        ft3 = imp ? L * W * (T / 12) : (L * 3.28084) * (W * 3.28084) * ((T / 100) * 3.28084);
-
-      } else if (currentShape === 'footing') {
-        const L = parseFloat(document.getElementById('footing-length').value);
-        const W = parseFloat(document.getElementById('footing-width').value);
-        const D = parseFloat(document.getElementById('footing-depth').value);
-        if (!L || !W || !D) return alert('Please fill in all dimensions.');
-        ft3 = imp ? L * W * (D / 12) : (L * 3.28084) * (W * 3.28084) * ((D / 100) * 3.28084);
-
-      } else if (currentShape === 'column') {
-        const D = parseFloat(document.getElementById('column-diameter').value);
-        const H = parseFloat(document.getElementById('column-height').value);
-        if (!D || !H) return alert('Please fill in all dimensions.');
-        if (imp) {
-          const r = (D / 12) / 2;
-          ft3 = Math.PI * r * r * H;
-        } else {
-          const r = ((D / 100) * 3.28084) / 2;
-          ft3 = Math.PI * r * r * (H * 3.28084);
-        }
-
-      } else if (currentShape === 'steps') {
-        const W     = parseFloat(document.getElementById('steps-width').value);
-        const rise  = parseFloat(document.getElementById('steps-rise').value);
-        const run   = parseFloat(document.getElementById('steps-run').value);
-        const count = parseFloat(document.getElementById('steps-count').value);
-        if (!W || !rise || !run || !count) return alert('Please fill in all dimensions.');
-        if (imp) {
-          ft3 = W * (run / 12) * (rise / 12) * count * (count + 1) / 2;
-        } else {
-          ft3 = (W * 3.28084) * ((run / 100) * 3.28084) * ((rise / 100) * 3.28084) * count * (count + 1) / 2;
-        }
-      }
-
-      const total = ft3 * waste;
-      const yd3   = total / 27;
-      const m3    = total * 0.0283168;
-      const tons  = m3 * 2.4;
-
-      document.getElementById('res-yd3').textContent    = yd3.toFixed(2) + ' yd³';
-      document.getElementById('res-m3').textContent     = m3.toFixed(2) + ' m³';
-      document.getElementById('res-ft3').textContent    = total.toFixed(2) + ' ft³';
-      document.getElementById('res-bags80').textContent = Math.ceil(total / 0.60) + ' bags';
-      document.getElementById('res-bags60').textContent = Math.ceil(total / 0.45) + ' bags';
-      document.getElementById('res-bags40').textContent = Math.ceil(total / 0.30) + ' bags';
-      document.getElementById('res-tons').textContent   = tons.toFixed(2) + ' t';
-
-      document.getElementById('result-placeholder').style.display = 'none';
-      document.getElementById('result-output').style.display = 'block';
-    }
-  </script>
-
-</body>
-</html>
+        const T =
