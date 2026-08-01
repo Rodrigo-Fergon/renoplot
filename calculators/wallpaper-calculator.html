@@ -344,4 +344,187 @@
             </div>
           </div>
 
-          <div
+          <div class="disclaimer" style="margin-top: 16px;">
+            Always verify quantities with your contractor or supplier before purchasing. This tool provides estimates for reference only.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- INFO SECTION -->
+  <section class="info-section">
+    <h2>How to Use This Calculator</h2>
+    <p>Measure the length and width of your room at floor level, and the height from floor to ceiling (or picture rail). Enter the number of standard doors and windows — the calculator applies a professional partial credit for openings rather than removing them entirely, because you still need full wallpaper strips above and below each door and window.</p>
+
+    <h2>What Is Pattern Repeat?</h2>
+    <p>Pattern repeat is the vertical distance after which a design starts again on the wallpaper roll. You'll find this number on the roll label or the product page, usually marked with a symbol that looks like two overlapping squares. A repeat of 0 means no alignment is needed. Larger repeats (25 cm / 10 in or more) increase waste significantly because each strip must be cut to start at the same point in the pattern.</p>
+
+    <h2>Straight Match vs. Half-Drop</h2>
+    <p>With a <strong>straight match</strong>, every strip starts at the same height in the pattern — the motif lines up horizontally across the wall. With a <strong>half-drop</strong>, alternating strips shift down by exactly half a repeat, creating a diagonal feel. Half-drop patterns are common in large florals and geometrics, and they waste more material because the offset cuts leave larger off-cuts at the top or bottom of each strip.</p>
+
+    <h2>US vs. UK Roll Sizes</h2>
+    <p>In the United States, wallpaper is typically sold in double rolls (also called a bolt), which cover approximately 57 square feet (5.3 m²). Single rolls are rarely sold individually. In the United Kingdom, the standard roll measures 10.05 m long by 530 mm wide, covering about 5.3 m² — which happens to be almost identical in area, but the strip length and width differ, affecting how many drops you get per roll.</p>
+
+    <h2>Why You Should Never Run Out Mid-Job</h2>
+    <p>Running short of wallpaper mid-room is one of the most common and costly decorating mistakes. Reordering even a single roll risks getting a different print batch — and the color difference, though subtle, becomes visible once the paper is on the wall. The calculator rounds up and includes a safety margin for this reason. Order everything at once, keep at least one spare roll, and store it flat.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2026 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let market = 'us';
+
+    const ROLL = {
+      us: { sqft: 57, sqm: 5.3, label: 'US double roll (~57 sq ft / 5.3 m²)' },
+      uk: { sqft: 57.3, sqm: 5.32, label: 'UK standard roll (10.05 m × 530 mm)' }
+    };
+
+    const DOOR_DEDUCT_M2 = 0.9;
+    const WIN_DEDUCT_M2  = 0.6;
+
+    const WASTE = {
+      none:     { factor: 1.10, label: '10% (no pattern)' },
+      straight: { factor: 1.20, label: '20% (straight match)' },
+      halfdrop: { factor: 1.30, label: '30% (half-drop match)' }
+    };
+
+    function setMarket(m) {
+      market = m;
+      document.getElementById('btn-us').classList.toggle('active', m === 'us');
+      document.getElementById('btn-uk').classList.toggle('active', m === 'uk');
+      document.getElementById('market-note').textContent = m === 'us'
+        ? 'US double roll selected: approx. 57 sq ft (5.3 m²) per roll — the most common format sold in American stores.'
+        : 'UK standard roll selected: 10.05 m × 530 mm, approx. 5.3 m² per roll — the format used by B&Q, Dunelm, Cole & Son, and most UK suppliers.';
+    }
+
+    function syncUnits() {
+      const ft = document.getElementById('units').value === 'ft';
+      const ph = ft ? 'e.g. 12' : 'e.g. 3.6';
+      const phH = ft ? 'e.g. 8' : 'e.g. 2.4';
+      document.getElementById('room-length').placeholder = ph;
+      document.getElementById('room-width').placeholder = ph;
+      document.getElementById('wall-height').placeholder = phH;
+      document.getElementById('lbl-length').textContent = ft ? 'Room Length (ft)' : 'Room Length (m)';
+      document.getElementById('lbl-width').textContent  = ft ? 'Room Width (ft)'  : 'Room Width (m)';
+      document.getElementById('lbl-height').textContent = ft ? 'Wall Height (ft)' : 'Wall Height (m)';
+    }
+
+    function updateMatchSelection() {
+      const options = document.querySelectorAll('.match-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        opt.classList.toggle('selected', radio.checked);
+      });
+      const val = document.querySelector('input[name="match"]:checked').value;
+      document.getElementById('repeat-field').style.display = (val === 'none') ? 'none' : 'block';
+    }
+
+    function toggleTip() {
+      document.getElementById('tip-box').classList.toggle('visible');
+    }
+    document.addEventListener('click', function(e) {
+      const tip = document.getElementById('tip-box');
+      if (!e.target.closest('.field-with-tip')) tip.classList.remove('visible');
+    });
+
+    function calculate() {
+      const units  = document.getElementById('units').value;
+      const len    = parseFloat(document.getElementById('room-length').value);
+      const wid    = parseFloat(document.getElementById('room-width').value);
+      const ht     = parseFloat(document.getElementById('wall-height').value);
+      const doors  = parseInt(document.getElementById('num-doors').value)  || 0;
+      const windows= parseInt(document.getElementById('num-windows').value)|| 0;
+      const match  = document.querySelector('input[name="match"]:checked').value;
+
+      if (!len || !wid || !ht || len <= 0 || wid <= 0 || ht <= 0) {
+        alert('Please enter valid room dimensions before calculating.');
+        return;
+      }
+
+      const toM = v => units === 'ft' ? v * 0.3048 : v;
+      const lenM = toM(len);
+      const widM = toM(wid);
+      const htM  = toM(ht);
+
+      const perimeter = 2 * (lenM + widM);
+      let wallArea = perimeter * htM;
+      wallArea -= doors   * DOOR_DEDUCT_M2;
+      wallArea -= windows * WIN_DEDUCT_M2;
+      wallArea = Math.max(wallArea, 0);
+
+      let adjustedArea = wallArea;
+      if (match !== 'none') {
+        const repeatVal  = parseFloat(document.getElementById('pattern-repeat').value) || 0;
+        const repeatUnit = document.getElementById('repeat-unit').value;
+        const repeatM    = repeatUnit === 'in' ? repeatVal * 0.0254 : repeatVal * 0.01;
+        if (repeatM > 0 && htM > 0) {
+          const dropsNeeded = Math.ceil(htM / repeatM);
+          const effectiveHt = dropsNeeded * repeatM;
+          const ratio = effectiveHt / htM;
+          adjustedArea = wallArea * ratio;
+        }
+      }
+
+      const { factor: wasteFactor, label: wasteLabel } = WASTE[match];
+      const totalWithWaste = adjustedArea * wasteFactor;
+      const rollSqm = ROLL[market].sqm;
+      const rollsRaw = totalWithWaste / rollSqm;
+      const rolls = Math.ceil(rollsRaw);
+      const finalRolls = (match === 'halfdrop') ? rolls + 1 : rolls;
+
+      const areaLabel = units === 'ft'
+        ? `${(wallArea * 10.764).toFixed(1)} sq ft (${wallArea.toFixed(2)} m²)`
+        : `${wallArea.toFixed(2)} m² (${(wallArea * 10.764).toFixed(1)} sq ft)`;
+
+      const perRollLabel = units === 'ft'
+        ? `${(rollSqm * 10.764).toFixed(0)} sq ft (${rollSqm} m²)`
+        : `${rollSqm} m² (${(rollSqm * 10.764).toFixed(0)} sq ft)`;
+
+      let note = '';
+      if (match === 'halfdrop') {
+        note = 'Half-drop patterns require careful alignment — one extra roll has been added as a professional safety margin beyond the standard waste factor.';
+      } else if (match === 'straight') {
+        note = 'Straight match waste is included. If your pattern repeat is larger than 50 cm (20 in), consider ordering one additional roll.';
+      }
+
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-output').style.display = 'block';
+
+      animateNumber('res-rolls', finalRolls);
+      document.getElementById('res-area').textContent      = areaLabel;
+      document.getElementById('res-per-roll').textContent  = perRollLabel;
+      document.getElementById('res-waste').textContent     = wasteLabel;
+      document.getElementById('res-standard').textContent  = ROLL[market].label;
+      document.getElementById('res-note').textContent      = note;
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 20));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 40);
+    }
+
+    syncUnits();
+  </script>
+
+</body>
+</html>
