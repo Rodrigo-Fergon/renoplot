@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fence Stain Calculator — How Many Gallons Do You Need? | RenoPlot</title>
+  <meta name="description" content="Calculate exactly how much stain you need for your wood fence based on style, wood condition, and stain type. Free fence stain calculator in US and UK units.">
+  <link rel="stylesheet" href="../style.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJE6FNPN32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KJE6FNPN32');
+  </script>
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Fence Stain Calculator",
+    "url": "https://renoplot.com/calculators/fence-stain-calculator.html",
+    "description": "Calculate exactly how much stain you need for your wood fence based on style, wood condition, and stain type. Free fence stain calculator in US and UK units.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (Web-based)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <style>
+    .match-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .match-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--white);
+    }
+    .match-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-option input[type="radio"] {
+      margin-top: 3px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+    .match-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .match-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary, #1e293b);
+    }
+    .match-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      line-height: 1.4;
+    }
+    .result-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 16px;
+    }
+    .result-alert-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .result-alert-text {
+      font-size: 0.8rem;
+      color: #92400e;
+      line-height: 1.5;
+    }
+    .result-alert-text strong {
+      color: #78350f;
+    }
+    .cross-link-box {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cross-link-box a {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: none;
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .cross-link-box a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <img src="../logo-icon.svg" alt="RenoPlot" class="logo-icon">
+        <span class="logo-text">Reno<span>Plot</span></span>
+      </a>
+      <span class="header-tagline">Free Home Improvement Calculators</span>
+    </div>
+  </header>
+
+  <!-- PAGE -->
+  <main class="calc-page">
+
+    <div class="calc-page-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <span>›</span>
+        <span>Fence Stain Calculator</span>
+      </div>
+      <h1 class="calc-page-title">Fence Stain Calculator</h1>
+      <p class="calc-page-desc">Enter your fence dimensions, style, and wood condition to get an accurate stain estimate — coverage varies more than most people expect between a new privacy fence and a weathered picket fence.</p>
+    </div>
+
+    <div class="calc-panels">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <div class="panel-title">Fence & Stain Details</div>
+
+        <div class="field">
+          <label for="unit-system">Measurement System</label>
+          <select id="unit-system" onchange="updateUnitLabels()">
+            <option value="us" selected>US — Gallons / sq ft</option>
+            <option value="uk">UK — Liters / m²</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="fence-length" id="lbl-length">Fence Length (ft)</label>
+            <input type="number" id="fence-length" placeholder="e.g. 150" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="fence-height" id="lbl-height">Fence Height (ft)</label>
+            <input type="number" id="fence-height" placeholder="e.g. 6" min="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="sides">Sides to Stain</label>
+          <select id="sides">
+            <option value="1" selected>One side only</option>
+            <option value="2">Both sides</option>
+          </select>
+        </div>
+
+        <div class="field" style="margin-top: 4px;">
+          <label>Fence Style</label>
+          <div class="match-selector" id="style-selector">
+            <label class="match-option selected">
+              <input type="radio" name="fencestyle" value="privacy" checked onchange="updateStyleSelection()">
+              <div>
+                <div class="match-label">Privacy / Solid Boards</div>
+                <div class="match-desc">Boards installed edge to edge with no gaps. Full surface area needs coverage.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="fencestyle" value="picket" onchange="updateStyleSelection()">
+              <div>
+                <div class="match-label">Picket / Spaced Boards</div>
+                <div class="match-desc">Boards installed with visible gaps between them, roughly 30–40% open. Less surface to cover per linear foot.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="fencestyle" value="shadowbox" onchange="updateStyleSelection()">
+              <div>
+                <div class="match-label">Shadowbox (Board-on-Board)</div>
+                <div class="match-desc">Alternating boards on both faces with overlap. More surface area than a simple solid fence.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top: 4px;">
+          <label>Wood Condition</label>
+          <div class="match-selector" id="condition-selector">
+            <label class="match-option selected">
+              <input type="radio" name="condition" value="new" checked onchange="updateConditionSelection()">
+              <div>
+                <div class="match-label">New / Smooth (under 1 year)</div>
+                <div class="match-desc">Dense, low-porosity wood. Takes stain evenly and needs less product.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="condition" value="weathered" onchange="updateConditionSelection()">
+              <div>
+                <div class="match-label">Weathered / Rough / Gray</div>
+                <div class="match-desc">Sun and rain have opened up the grain. Absorbs 20–40% more stain than new wood.</div>
+              </div>
+            </label>
+            <label class="match-option">
+              <input type="radio" name="condition" value="restained" onchange="updateConditionSelection()">
+              <div>
+                <div class="match-label">Previously Stained / Sealed</div>
+                <div class="match-desc">A maintenance coat over existing stain. Usually needs the least product of the three.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="stain-type">Stain Type</label>
+          <select id="stain-type">
+            <option value="transparent" selected>Transparent / Semi-Transparent (Oil-Based)</option>
+            <option value="watersemi">Semi-Transparent (Water-Based)</option>
+            <option value="solid">Solid Color</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="num-coats">Number of Coats</label>
+          <select id="num-coats">
+            <option value="1">1 coat</option>
+            <option value="2" selected>2 coats (most fences)</option>
+          </select>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">Calculate Stain Needed</button>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="panel" id="results-panel">
+        <div class="panel-title">Your Estimate</div>
+
+        <div class="results-placeholder" id="placeholder">
+          <div class="results-placeholder-icon">🪵</div>
+          <p>Fill in your fence details and click Calculate to see your stain estimate.</p>
+        </div>
+
+        <div id="results" style="display:none;">
+          <div class="result-main">
+            <div class="result-label">Stain Needed</div>
+            <div class="result-number" id="result-value">0</div>
+            <div class="result-unit" id="result-unit-label">gallons</div>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="breakdown-label">Fence surface area</span>
+              <span class="breakdown-value" id="bd-area">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coverage rate</span>
+              <span class="breakdown-value" id="bd-coverage">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Coats</span>
+              <span class="breakdown-value" id="bd-coats">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Total area to cover</span>
+              <span class="breakdown-value" id="bd-total">—</span>
+            </div>
+          </div>
+
+          <div class="result-note" id="result-note"></div>
+
+          <div class="result-alert" id="condition-alert" style="display:none;">
+            <div class="result-alert-icon">⚠️</div>
+            <div class="result-alert-text" id="condition-alert-text"></div>
+          </div>
+
+          <div class="cross-link-box">
+            <a href="fence-calculator.html">Building the fence itself? Try our Fence Calculator →</a>
+            <a href="primer-calculator.html" id="primer-link" style="display:none;">Old finish flaking or bare patches? Check our Primer Calculator →</a>
+          </div>
+
+          <div class="result-note" style="margin-top:10px; background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            Always verify quantities with your stain manufacturer before purchasing. This tool provides estimates for reference only.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+      <h2>How to Calculate How Much Fence Stain You Need</h2>
+      <p>Measure the total length and height of your fence to find the base surface area, then adjust for your fence style, whether you're staining one side or both, and your wood's condition. Coverage rates on the can assume smooth, evenly porous wood — real fences rarely match that exactly, which is why condition matters as much as square footage.</p>
+
+      <h3>Why Fence Style Changes the Math</h3>
+      <p>A <strong>privacy or solid-board fence</strong> has no gaps, so the full length times height is your surface area. A <strong>picket fence</strong> has visible spacing between boards, so you're covering roughly 30–40% less actual wood per linear foot. A <strong>shadowbox fence</strong> alternates boards on both faces with overlap, which adds extra surface area beyond a simple flat panel — often close to what you'd use staining both sides of a solid fence.</p>
+
+      <h3>Why Wood Condition Matters More Than the Can Label</h3>
+      <p>New, smooth wood under a year old is dense and takes stain evenly, so it's the most efficient surface to cover. Weathered, gray, or rough wood has an opened-up grain from sun and rain exposure, and can absorb 20–40% more stain than the manufacturer's coverage rate suggests. A maintenance coat over previously stained wood usually needs the least product of the three, since the surface is already partially sealed.</p>
+
+      <h3>Oil-Based, Water-Based, or Solid?</h3>
+      <p>Oil-based semi-transparent stains penetrate deeper into the wood grain and typically cover less area per gallon than water-based formulas. Solid color stains sit more like a thin paint film on the surface and generally cover more area per gallon, though they hide the wood grain rather than showing it through.</p>
+
+      <h3>One Coat or Two?</h3>
+      <p>Two coats is the standard recommendation for most fences, especially bare or weathered wood, to get full, even color and protection. New wood under a year old can sometimes get away with one coat, since it hasn't opened up enough to need a second pass.</p>
+
+      <h3>Building or Repairing the Fence First?</h3>
+      <p>If you haven't built the fence yet, start with our <a href="fence-calculator.html">Fence Calculator</a> to plan posts, panels, and concrete. If the existing finish is peeling, bare in patches, or you're switching from paint to stain, check our <a href="primer-calculator.html">Primer Calculator</a> before your first coat.</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Reno<span>Plot</span></div>
+      <p class="footer-text">© 2026 RenoPlot.com — Free home improvement calculators. All estimates are for reference only.</p>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SQFT_PER_M2 = 10.7639;
+    const LITERS_PER_GALLON = 3.78541;
+
+    let fenceStyle = 'privacy';
+    let woodCondition = 'new';
+
+    // Style multiplier: how much of the length x height area is actually solid wood to cover
+    const STYLE_MULTIPLIER = {
+      privacy:   1.0,
+      picket:    0.65,
+      shadowbox: 1.15
+    };
+
+    // Coverage rates in sq ft per gallon (per coat), by wood condition and stain type
+    const coverageTable = {
+      new:       { transparent: 200, watersemi: 250, solid: 300 },
+      weathered: { transparent: 150, watersemi: 180, solid: 220 },
+      restained: { transparent: 220, watersemi: 270, solid: 320 }
+    };
+
+    function updateUnitLabels() {
+      const unit = document.getElementById('unit-system').value;
+      const lenLabel = document.getElementById('lbl-length');
+      const heightLabel = document.getElementById('lbl-height');
+      const lenInput = document.getElementById('fence-length');
+      const heightInput = document.getElementById('fence-height');
+
+      if (unit === 'uk') {
+        lenLabel.textContent = 'Fence Length (m)';
+        heightLabel.textContent = 'Fence Height (m)';
+        lenInput.placeholder = 'e.g. 45';
+        heightInput.placeholder = 'e.g. 1.8';
+      } else {
+        lenLabel.textContent = 'Fence Length (ft)';
+        heightLabel.textContent = 'Fence Height (ft)';
+        lenInput.placeholder = 'e.g. 150';
+        heightInput.placeholder = 'e.g. 6';
+      }
+    }
+
+    function updateStyleSelection() {
+      const options = document.querySelectorAll('#style-selector .match-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        opt.classList.toggle('selected', radio.checked);
+      });
+      fenceStyle = document.querySelector('input[name="fencestyle"]:checked').value;
+    }
+
+    function updateConditionSelection() {
+      const options = document.querySelectorAll('#condition-selector .match-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        opt.classList.toggle('selected', radio.checked);
+      });
+      woodCondition = document.querySelector('input[name="condition"]:checked').value;
+    }
+
+    function getConditionAlert(condition) {
+      if (condition === 'weathered') {
+        return "Weathered, gray, or rough wood should be cleaned and brightened before staining — otherwise the new stain can go on blotchy. If any boards have bare, worn-through patches or you're switching from an old paint finish, check the Primer Calculator link below first.";
+      }
+      if (condition === 'restained') {
+        return "For a maintenance coat over existing stain, a light cleaning is usually enough — avoid stripping unless the old finish is peeling or badly discolored.";
+      }
+      return null;
+    }
+
+    function calculate() {
+      const unit = document.getElementById('unit-system').value;
+      const lengthInput = parseFloat(document.getElementById('fence-length').value);
+      const heightInput = parseFloat(document.getElementById('fence-height').value);
+      const sides = parseInt(document.getElementById('sides').value);
+      const stainType = document.getElementById('stain-type').value;
+      const coats = parseInt(document.getElementById('num-coats').value);
+
+      if (!lengthInput || lengthInput <= 0 || !heightInput || heightInput <= 0) {
+        alert('Please enter a valid fence length and height before calculating.');
+        return;
+      }
+
+      // Convert length and height to feet for internal math if UK is selected
+      const FT_PER_M = 3.28084;
+      const lengthFt = unit === 'uk' ? lengthInput * FT_PER_M : lengthInput;
+      const heightFt = unit === 'uk' ? heightInput * FT_PER_M : heightInput;
+
+      const baseAreaSqFt = lengthFt * heightFt;
+      const styleMultiplier = STYLE_MULTIPLIER[fenceStyle];
+      const sidesMultiplier = sides;
+      const totalAreaSqFt = baseAreaSqFt * styleMultiplier * sidesMultiplier * coats;
+
+      const coverageSqFtPerGallon = coverageTable[woodCondition][stainType];
+      const gallonsExact = totalAreaSqFt / coverageSqFtPerGallon;
+
+      let resultValue, resultUnitLabel, coverageDisplay, areaDisplay, totalDisplay;
+
+      const singleCoatAreaSqFt = baseAreaSqFt * styleMultiplier * sidesMultiplier;
+
+      if (unit === 'uk') {
+        const litersExact = gallonsExact * LITERS_PER_GALLON;
+        const litersRounded = Math.ceil(litersExact * 2) / 2; // round up to nearest 0.5 L
+        resultValue = litersRounded;
+        resultUnitLabel = litersRounded === 1 ? 'liter' : 'liters';
+        const coverageM2PerLiter = (coverageSqFtPerGallon / SQFT_PER_M2) / LITERS_PER_GALLON;
+        coverageDisplay = coverageM2PerLiter.toFixed(1) + ' m²/liter';
+        areaDisplay = (singleCoatAreaSqFt / SQFT_PER_M2).toFixed(1) + ' m²';
+        totalDisplay = (totalAreaSqFt / SQFT_PER_M2).toFixed(1) + ' m²';
+      } else {
+        const gallonsRounded = Math.ceil(gallonsExact * 2) / 2; // round up to nearest half gallon
+        resultValue = gallonsRounded;
+        resultUnitLabel = gallonsRounded === 1 ? 'gallon' : 'gallons';
+        coverageDisplay = coverageSqFtPerGallon + ' sq ft/gal';
+        areaDisplay = singleCoatAreaSqFt.toFixed(0) + ' sq ft';
+        totalDisplay = totalAreaSqFt.toFixed(0) + ' sq ft';
+      }
+
+      document.getElementById('result-value').textContent = resultValue;
+      document.getElementById('result-unit-label').textContent = resultUnitLabel;
+      document.getElementById('bd-area').textContent = areaDisplay;
+      document.getElementById('bd-coverage').textContent = coverageDisplay;
+      document.getElementById('bd-coats').textContent = coats + (coats === 1 ? ' coat' : ' coats');
+      document.getElementById('bd-total').textContent = totalDisplay;
+
+      document.getElementById('result-note').textContent =
+        "This estimate includes the style and condition adjustments above. Always confirm coverage with the specific product label — heavily textured or rough-sawn wood can use noticeably more stain.";
+
+      const alertText = getConditionAlert(woodCondition);
+      const alertBox = document.getElementById('condition-alert');
+      const primerLink = document.getElementById('primer-link');
+      if (alertText) {
+        document.getElementById('condition-alert-text').innerHTML = '<strong>Check wood condition first:</strong> ' + alertText;
+        alertBox.style.display = 'flex';
+        primerLink.style.display = woodCondition === 'weathered' ? 'block' : 'none';
+      } else {
+        alertBox.style.display = 'none';
+        primerLink.style.display = 'none';
+      }
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+    }
+
+    updateUnitLabels();
+  </script>
+
+</body>
+</html>
