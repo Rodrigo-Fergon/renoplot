@@ -135,7 +135,7 @@
     <div class="header-inner">
       <a href="../index.html" class="logo">
         <img src="../logo-icon.svg" alt="RenoPlot" class="logo-icon">
-        <span class="logo-text">RenoPlot</span>
+        <span class="logo-text">Reno<span>Plot</span></span>
       </a>
       <span class="header-tagline">Free Home Improvement Calculators</span>
     </div>
@@ -417,4 +417,97 @@
       if (currentShape === 'slab') {
         const L = parseFloat(document.getElementById('slab-length').value);
         const W = parseFloat(document.getElementById('slab-width').value);
-        const T =
+        const T = parseFloat(document.getElementById('slab-thickness').value);
+        if (isNaN(L) || isNaN(W) || isNaN(T) || L <= 0 || W <= 0 || T <= 0) {
+          alert('Please enter valid length, width, and thickness values.');
+          return;
+        }
+        if (imp) {
+          ft3 = L * W * (T / 12);
+        } else {
+          const Lft = L * 3.28084;
+          const Wft = W * 3.28084;
+          const Tft = (T / 100) * 3.28084;
+          ft3 = Lft * Wft * Tft;
+        }
+      } else if (currentShape === 'footing') {
+        const L = parseFloat(document.getElementById('footing-length').value);
+        const W = parseFloat(document.getElementById('footing-width').value);
+        const D = parseFloat(document.getElementById('footing-depth').value);
+        if (isNaN(L) || isNaN(W) || isNaN(D) || L <= 0 || W <= 0 || D <= 0) {
+          alert('Please enter valid length, width, and depth values.');
+          return;
+        }
+        if (imp) {
+          ft3 = L * W * (D / 12);
+        } else {
+          const Lft = L * 3.28084;
+          const Wft = W * 3.28084;
+          const Dft = (D / 100) * 3.28084;
+          ft3 = Lft * Wft * Dft;
+        }
+      } else if (currentShape === 'column') {
+        const Dia = parseFloat(document.getElementById('column-diameter').value);
+        const H = parseFloat(document.getElementById('column-height').value);
+        if (isNaN(Dia) || isNaN(H) || Dia <= 0 || H <= 0) {
+          alert('Please enter valid diameter and height values.');
+          return;
+        }
+        if (imp) {
+          const radiusFt = (Dia / 12) / 2;
+          ft3 = Math.PI * Math.pow(radiusFt, 2) * H;
+        } else {
+          const radiusFt = ((Dia / 100) / 2) * 3.28084;
+          const Hft = H * 3.28084;
+          ft3 = Math.PI * Math.pow(radiusFt, 2) * Hft;
+        }
+      } else if (currentShape === 'steps') {
+        const stepWidth = parseFloat(document.getElementById('steps-width').value);
+        const rise = parseFloat(document.getElementById('steps-rise').value);
+        const run = parseFloat(document.getElementById('steps-run').value);
+        const count = parseFloat(document.getElementById('steps-count').value);
+        if (isNaN(stepWidth) || isNaN(rise) || isNaN(run) || isNaN(count) || stepWidth <= 0 || rise <= 0 || run <= 0 || count <= 0) {
+          alert('Please enter valid width, rise, run, and number of steps.');
+          return;
+        }
+        let widthFt, riseFt, runFt;
+        if (imp) {
+          widthFt = stepWidth;
+          riseFt = rise / 12;
+          runFt = run / 12;
+        } else {
+          widthFt = stepWidth * 3.28084;
+          riseFt = (rise / 100) * 3.28084;
+          runFt = (run / 100) * 3.28084;
+        }
+        let total = 0;
+        for (let i = 1; i <= count; i++) {
+          total += widthFt * runFt * (riseFt * i);
+        }
+        ft3 = total;
+      }
+
+      const ft3WithWaste = ft3 * waste;
+      const yd3 = ft3WithWaste / 27;
+      const m3 = ft3WithWaste / 35.3147;
+      const bags80 = Math.ceil(ft3WithWaste / 0.60);
+      const bags60 = Math.ceil(ft3WithWaste / 0.45);
+      const bags40 = Math.ceil(ft3WithWaste / 0.30);
+      const tons = yd3 * 1.837;
+
+      document.getElementById('res-yd3').textContent = yd3.toFixed(2);
+      document.getElementById('res-m3').textContent = m3.toFixed(2) + ' m³';
+      document.getElementById('res-ft3').textContent = ft3WithWaste.toFixed(2) + ' ft³';
+      document.getElementById('res-bags80').textContent = bags80.toLocaleString() + ' bags';
+      document.getElementById('res-bags60').textContent = bags60.toLocaleString() + ' bags';
+      document.getElementById('res-bags40').textContent = bags40.toLocaleString() + ' bags';
+      document.getElementById('res-tons').textContent = tons.toFixed(2) + ' t';
+
+      document.getElementById('result-placeholder').style.display = 'none';
+      document.getElementById('result-output').style.display = 'block';
+    }
+
+    updateLabels();
+  </script>
+</body>
+</html>
